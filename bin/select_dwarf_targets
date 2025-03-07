@@ -61,7 +61,7 @@ if dn is not None:
 
 # ADM flip the sense of some inputs.
 addnors = not(ns.donotaddnors)
-readperstream = not(ns.donotreadperdwarf)
+readperdwarf = not(ns.donotreadperdwarf)
 readcache = not(ns.donotreadcache)
 
 targets = cuts.select_targets(

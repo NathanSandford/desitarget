@@ -102,7 +102,7 @@ def is_in_dwarf(objs, dwarf_name):
     brightpm1_magsel = (r > dwarf['BRIGHT_LIMIT']) & (z <= stream['BRIGHTPM1_LIMIT'])
     brightpm2_magsel = betw(z, dwarf['BRIGHTPM1_LIMIT'], dwarf['BRIGHTPM2_LIMIT'])
     brightpm3_magsel = betw(z, dwarf['BRIGHTPM2_LIMIT'], dwarf['BRIGHTPM3_LIMIT'])
-    pm_only_magsel = (r > dwarf['BRIGHT_LIMIT']) & (z <= stream['PM_ONLY_LIMIT']
+    pm_only_magsel = (r > dwarf['BRIGHT_LIMIT']) & (z <= stream['PM_ONLY_LIMIT'])
     faint_no_pm_magsel = betw(z, dwarf['FAINT_NO_PM_LIMIT'], dwarf['FAINT_LIMIT'])
     filler_magsel = betw(z, dwarf['FILLER_LIMIT'], dwarf['FAINT_LIMIT'])
 
@@ -131,7 +131,7 @@ def is_in_dwarf(objs, dwarf_name):
     log.info(f"Objects meeting PM_ONLY selection: {pm_only.sum()}...t={time()-start:.1f}s")
 
     # NRS FAINT_NO_PM targets
-    faint_no_pm = cmd_sel & field_sel & faint_no_pm_magsel & & ~np.isfinite(objs['PMRA']) & _psflike(objs["TYPE"])
+    faint_no_pm = cmd_sel & field_sel & faint_no_pm_magsel & ~np.isfinite(objs['PMRA']) & _psflike(objs["TYPE"])
     log.info(f"Objects meeting FAINT_NO_PM selection: {faint_no_pm.sum()}...t={time()-start:.1f}s")
 
     # NRS FILLER targets
