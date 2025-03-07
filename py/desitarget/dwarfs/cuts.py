@@ -86,7 +86,7 @@ def is_in_dwarf(objs, dwarf_name):
 
     # NRS Gaia-based selection (proper motion, parallax, bright limit).
     gaia_pm_sel = pm_sel_func(
-        pmra0, pmdec0, objs, pad=dwarf['PM_PAD'], dwarf['PM_NSIG']
+        pmra0, pmdec0, objs, pad=dwarf['PM_PAD'], mult=dwarf['PM_NSIG']
     )
     gaia_plx_sel = plx_sel_func(
         dist, objs, plx_sys=dwarf['PLX_SYS'], mult=dwarf['PLX_NSIG'],
