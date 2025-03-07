@@ -12,7 +12,7 @@ BOOTES_1:
     RHALF: 0.17
     ELLIPTICITY: 0.30
     POSITION_ANGLE: 6.00
-    # NRS Spatial extent in degrees for initial data read.
+    # NRS spatial extent in degrees for initial data read.
     MAXD: 5.0000
     # NRS galaxy distance in kpc.
     DIST: 66.37
@@ -45,7 +45,7 @@ BOOTES_1:
     BRIGHTPM2_LIMIT:  19.00
     # NRS faint z-band magnitude limit for BRIGHTPM3 targets
     BRIGHTPM3_LIMIT:  20.50
-    # NRS bright z-band magnitude limit for PM_ONLY targets
+    # NRS faint z-band magnitude limit for PM_ONLY targets
     PM_ONLY_LIMIT:  19.00
     # NRS bright z-band magnitude limit for FAINT_NO_PM targets
     FAINT_NO_PM_LIMIT:  19.00
@@ -66,7 +66,7 @@ CANES_VENATICI_1:
     RHALF: 0.12
     ELLIPTICITY: 0.44
     POSITION_ANGLE: 80.00
-    # NRS Spatial extent in degrees for initial data read.
+    # NRS spatial extent in degrees for initial data read.
     MAXD: 5.0000
     # NRS galaxy distance in kpc.
     DIST: 210.86
@@ -99,7 +99,7 @@ CANES_VENATICI_1:
     BRIGHTPM2_LIMIT:  19.00
     # NRS faint z-band magnitude limit for BRIGHTPM3 targets
     BRIGHTPM3_LIMIT:  20.50
-    # NRS bright z-band magnitude limit for PM_ONLY targets
+    # NRS faint z-band magnitude limit for PM_ONLY targets
     PM_ONLY_LIMIT:  19.00
     # NRS bright z-band magnitude limit for FAINT_NO_PM targets
     FAINT_NO_PM_LIMIT:  19.00
@@ -120,7 +120,7 @@ DRACO_1:
     RHALF: 0.16
     ELLIPTICITY: 0.29
     POSITION_ANGLE: 87.00
-    # NRS Spatial extent in degrees for initial data read.
+    # NRS spatial extent in degrees for initial data read.
     MAXD: 5.0000
     # NRS galaxy distance in kpc.
     DIST: 81.55
@@ -153,7 +153,7 @@ DRACO_1:
     BRIGHTPM2_LIMIT:  19.00
     # NRS faint z-band magnitude limit for BRIGHTPM3 targets
     BRIGHTPM3_LIMIT:  20.50
-    # NRS bright z-band magnitude limit for PM_ONLY targets
+    # NRS faint z-band magnitude limit for PM_ONLY targets
     PM_ONLY_LIMIT:  19.00
     # NRS bright z-band magnitude limit for FAINT_NO_PM targets
     FAINT_NO_PM_LIMIT:  19.00
@@ -174,7 +174,7 @@ SEXTANS_1:
     RHALF: 0.38
     ELLIPTICITY: 0.27
     POSITION_ANGLE: 52.00
-    # NRS Spatial extent in degrees for initial data read.
+    # NRS spatial extent in degrees for initial data read.
     MAXD: 5.0000
     # NRS galaxy distance in kpc.
     DIST: 85.90
@@ -207,7 +207,7 @@ SEXTANS_1:
     BRIGHTPM2_LIMIT:  19.00
     # NRS faint z-band magnitude limit for BRIGHTPM3 targets
     BRIGHTPM3_LIMIT:  20.50
-    # NRS bright z-band magnitude limit for PM_ONLY targets
+    # NRS faint z-band magnitude limit for PM_ONLY targets
     PM_ONLY_LIMIT:  19.00
     # NRS bright z-band magnitude limit for FAINT_NO_PM targets
     FAINT_NO_PM_LIMIT:  19.00
@@ -228,7 +228,7 @@ URSA_MINOR_1:
     RHALF: 0.30
     ELLIPTICITY: 0.55
     POSITION_ANGLE: 50.00
-    # NRS Spatial extent in degrees for initial data read.
+    # NRS spatial extent in degrees for initial data read.
     MAXD: 5.0000
     # NRS galaxy distance in kpc.
     DIST: 70.15
@@ -261,7 +261,7 @@ URSA_MINOR_1:
     BRIGHTPM2_LIMIT:  19.00
     # NRS faint z-band magnitude limit for BRIGHTPM3 targets
     BRIGHTPM3_LIMIT:  20.50
-    # NRS bright z-band magnitude limit for PM_ONLY targets
+    # NRS faint z-band magnitude limit for PM_ONLY targets
     PM_ONLY_LIMIT:  19.00
     # NRS bright z-band magnitude limit for FAINT_NO_PM targets
     FAINT_NO_PM_LIMIT:  19.00
