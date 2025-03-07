@@ -116,6 +116,11 @@ mws_mask:
     - [MWS_FILLER,          26, "DESI Extension filler target on stream or dSph tiles",       {obsconditions: BRIGHT}]
     - [MWS_GD1,             27, "DESI Extension GD1 stream target",                           {obsconditions: BRIGHT}]
     - [MWS_ORPHAN,          28, "DESI Extension Orphan-Chenab stream target",                 {obsconditions: BRIGHT}]
+    - [MWS_BOOTES_1,        40, "DESI Extension Bootes I dSph target",                        {obsconditions: BRIGHT}]
+    - [MWS_CANES_VENATICI_1,41, "DESI Extension Canes Venatici I dSph target",                {obsconditions: BRIGHT}]
+    - [MWS_DRACO_1,         42, "DESI Extension Draco dSph target",                           {obsconditions: BRIGHT}]
+    - [MWS_SEXTANS_1,       43, "DESI Extension Sextans dSph target",                         {obsconditions: BRIGHT}]
+    - [MWS_URSA_MINOR_1,    44, "DESI Extension Ursa Minor dSph target",                      {obsconditions: BRIGHT}]
 
     # ADM Standard stars based only on Gaia.
     - [GAIA_STD_FAINT,      33, "Standard stars for dark/gray conditions",   {obsconditions: DARK|BACKUP|TWILIGHT12|TWILIGHT18}]
@@ -529,6 +534,11 @@ numobs:
         MWS_FILLER:                  10
         MWS_GD1:                     -1
         MWS_ORPHAN:                  -1
+        MWS_BOOTES_1:                -1
+        MWS_CANES_VENATICI_1:        -1
+        MWS_DRACO_1:                 -1
+        MWS_SEXTANS_1:               -1
+        MWS_URSA_MINOR_1:            -1
 
 # ADM don't observe a N/S target if it doesn't have other bits set.
         MWS_BROAD_NORTH:              0
