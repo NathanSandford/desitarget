@@ -1,10 +1,10 @@
 """
-desitarget.streams.cuts
+desitarget.dwarf.cuts
 =======================
 
 Target selection cuts for the DESI MWS dSph programs.
 
-Borrows heavily from Sergey Koposov and the DESI stream target selection cuts.
+Borrows heavily from Sergey Koposov and the DESI stream target selection cuts (desitarget.stream.cuts).
 """
 from time import time
 import numpy as np
@@ -56,7 +56,7 @@ def is_in_dwarf(objs, dwarf_name):
     """
     # ADM start the clock.
     start = time()
-    log.info(f"Starting selection for {stream_name}...t={time()-start:.1f}s")
+    log.info(f"Starting selection for {dwarf_name}...t={time()-start:.1f}s")
 
     # NRS look up the defining parameters of the dwarf.
     dwarf = get_dwarf_parameters(dwarf_name)
@@ -73,7 +73,6 @@ def is_in_dwarf(objs, dwarf_name):
     ext_coeff = dict(g=3.237, r=2.176, z=1.217)
     g, r, z = [22.5 - 2.5 * np.log10(objs['FLUX_' + _]) for _ in 'GRZ']
     eg, er, ez = [ext_coeff[_] * objs['EBV'] for _ in 'grz']
-    gerr, rerr, zerr = [2.5 / np.log(10) * (np.sqrt(1./objs['FLUX_IVAR_'+_]) / objs['FLUX_' + _]) for _ in 'GRZ']
     g0 = g - eg
     r0 = r - er
     z0 = z - ez
@@ -99,10 +98,10 @@ def is_in_dwarf(objs, dwarf_name):
     cmd_sel = cmd_sel_func(dwarf_name, objs)
 
     # NRS magnitude ranges
-    brightpm1_magsel = (r > dwarf['BRIGHT_LIMIT']) & (z <= stream['BRIGHTPM1_LIMIT'])
+    brightpm1_magsel = (r > dwarf['BRIGHT_LIMIT']) & (z <= dwarf['BRIGHTPM1_LIMIT'])
     brightpm2_magsel = betw(z, dwarf['BRIGHTPM1_LIMIT'], dwarf['BRIGHTPM2_LIMIT'])
     brightpm3_magsel = betw(z, dwarf['BRIGHTPM2_LIMIT'], dwarf['BRIGHTPM3_LIMIT'])
-    pm_only_magsel = (r > dwarf['BRIGHT_LIMIT']) & (z <= stream['PM_ONLY_LIMIT'])
+    pm_only_magsel = (r > dwarf['BRIGHT_LIMIT']) & (z <= dwarf['PM_ONLY_LIMIT'])
     faint_no_pm_magsel = betw(z, dwarf['FAINT_NO_PM_LIMIT'], dwarf['FAINT_LIMIT'])
     filler_magsel = betw(z, dwarf['FILLER_LIMIT'], dwarf['FAINT_LIMIT'])
 
@@ -122,17 +121,12 @@ def is_in_dwarf(objs, dwarf_name):
     bright_pm2 = cmd_sel & gaia_astrom_sel & field_sel & brightpm2_magsel
     bright_pm3 = cmd_sel & gaia_astrom_sel & field_sel & brightpm3_magsel
     bright_pm = bright_pm1 | bright_pm2 | bright_pm3
-    log.info(f"Objects meeting BRIGHT_PM selection: {bright_pm.sum()}, " 
-             + f"(by bin: {bright_pm1.sum()}/{bright_pm2.sum()}/{bright_pm3.sum()})" 
-             + f"...t={time()-start:.1f}s")
 
     # NRS PM_ONLY targets
     pm_only = ~cmd_sel & gaia_astrom_sel & field_sel & pm_only_magsel & betw(g0_r0, -0.3, 1.3)
-    log.info(f"Objects meeting PM_ONLY selection: {pm_only.sum()}...t={time()-start:.1f}s")
 
     # NRS FAINT_NO_PM targets
     faint_no_pm = cmd_sel & field_sel & faint_no_pm_magsel & ~np.isfinite(objs['PMRA']) & _psflike(objs["TYPE"])
-    log.info(f"Objects meeting FAINT_NO_PM selection: {faint_no_pm.sum()}...t={time()-start:.1f}s")
 
     # NRS FILLER targets
     filler = field_sel & filler_magsel & stellar_locus_sel & betw(g0_r0, -0.3, 1.2) & _psflike(objs["TYPE"]) & ~bright_pm & ~pm_only & ~faint_no_pm
@@ -143,7 +137,7 @@ def is_in_dwarf(objs, dwarf_name):
     log.info(f"Objects meeting BRIGHTPM2 selection: {np.sum(bright_pm2)}")
     log.info(f"Objects meeting BRIGHTPM3 selection: {np.sum(bright_pm3)}")
     log.info(f"Objects meeting FAINT_NO_PM selection: {np.sum(faint_no_pm)}")
-    log.info(f"Objects meeting PM_ONLY selection: {np.sum(faint_no_pm)}")
+    log.info(f"Objects meeting PM_ONLY selection: {np.sum(pm_only)}")
     log.info(f"Objects meeting FILLER selection: {np.sum(filler)}")
     log.info(f"Finished selection for {dwarf_name}...t={time()-start:.1f}s")
 
@@ -194,10 +188,11 @@ def set_target_bits(objs, dwarf_names=['BOOTES_1', 'CANES_VENATICI_1', 'DRACO_1'
         bright_pm1, bright_pm2, bright_pm3, pm_only, faint_no_pm, filler = is_in_dwarf(
             objs, dwarf_name
         )
+        all_targets = (bright_pm1 | bright_pm2 | bright_pm3 | pm_only | faint_no_pm | filler)
         # CMR set mws desi extension bit
         mws_target |= (mws_target != 0) * mws_mask.MWS_EXT
         # NRS set dwarf name bit
-        mws_target |= (mws_target != 0) * mws_mask[f"MWS_{dwarf_name}"]
+        mws_target |= all_targets * mws_mask[f"MWS_{dwarf_name}"]
         # CMR set target subclass bit masks
         mws_target |= bright_pm1 * mws_mask.MWS_BRIGHT_PM1
         mws_target |= bright_pm2 * mws_mask.MWS_BRIGHT_PM2
@@ -261,7 +256,7 @@ def select_targets(
         ``BGS_TARGET``, ``MWS_TARGET``, ``SCND_TARGET`` (i.e. target
         selection bitmasks).
     """
-    if readperstream:
+    if readperdwarf:
         # ADM loop over dwarfs and read in the data per-dwarf.
         # ADM eventually, for multiple dwarfs, we would likely switch
         # ADM to read in each sweep file and parallelizing across files.
@@ -275,7 +270,7 @@ def select_targets(
             maxd = dwarf["MAXD"]
             # NRS read in the data.
             objs = read_data_per_dwarf(swdir, ra0, dec0, maxd, dwarf_name,
-                                        addnors=addnors, readcache=readcache)
+                                        addnors=addnors, readcache=readcache, numproc=1)
             allobjs.append(objs)
         objects = np.concatenate(allobjs)
     else:
