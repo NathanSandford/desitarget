@@ -27,12 +27,13 @@ from desiutil.log import get_logger
 log = get_logger()
 
 # ADM the Legacy Surveys part of the data model for working with streams.
+# NRS Added FLUX_IVAR_G/R/Z for dwarf galaxy CMD selection.
 streamcolsLS = np.array([], dtype=[
     ('RELEASE', '>i2'), ('BRICKID', '>i4'), ('TYPE', 'S4'),
     ('OBJID', '>i4'), ('RA', '>f8'), ('DEC', '>f8'), ('EBV', '>f4'),
-    ('FLUX_G', '>f4'), ('FIBERTOTFLUX_G', '>f4'),
-    ('FLUX_R', '>f4'), ('FIBERTOTFLUX_R', '>f4'),
-    ('FLUX_Z', '>f4'), ('FIBERTOTFLUX_Z', '>f4'),
+    ('FLUX_G', '>f4'), ('FLUX_IVAR_G', '>f4'), ('FIBERTOTFLUX_G', '>f4'),
+    ('FLUX_R', '>f4'), ('FLUX_IVAR_R', '>f4'), ('FIBERTOTFLUX_R', '>f4'),
+    ('FLUX_Z', '>f4'), ('FLUX_IVAR_Z', '>f4'), ('FIBERTOTFLUX_Z', '>f4'),
 ])
 
 # ADM the Gaia part of the data model for working with streams.
