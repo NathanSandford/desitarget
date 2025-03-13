@@ -147,7 +147,7 @@ def get_plx_error(D):
         parallax_error = D['PARALLAX_ERROR']
     elif 'PARALLAX_IVAR' in D.dtype.names:
         parallax_error = np.zeros_like(D["PARALLAX_IVAR"]) + 1e8
-        ii = lit_mem['PARALLAX_IVAR'] != 0
+        ii = D['PARALLAX_IVAR'] != 0
         parallax_error[ii] = 1./np.sqrt(D[ii]['PARALLAX_IVAR'])
     else:
         msg = "Either PARALLAX_ERROR or PARALLAX_IVAR must be passed!"
@@ -369,3 +369,12 @@ def cmd_sel_func(
     hb_sel = mag_sel_hb & color_sel_hb
 
     return rgb_sel | hb_sel
+
+
+def transform2center(ra, dec, ra0, dec0):
+    dRA = np.rad2deg(np.cos(np.deg2rad(dec)) * np.sin(np.deg2rad(ra - ra0)))
+    dDec = np.rad2deg(
+        np.sin(np.deg2rad(dec)) * np.cos(np.deg2rad(dec0)) \
+            - np.cos(np.deg2rad(dec)) * np.sin(np.deg2rad(dec0)) * np.cos(np.deg2rad(ra - ra0))
+    )
+    return dRA, dDec
