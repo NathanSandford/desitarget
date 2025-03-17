@@ -218,9 +218,11 @@ def set_target_bits(objs, dwarf_names=['BOOTES_1', 'CANES_VENATICI_1', 'DRACO_1'
 def select_targets(
     swdir, 
     dwarf_names=['BOOTES_1', 'CANES_VENATICI_1', 'DRACO_1', 'SEXTANS_1', 'URSA_MINOR_1'], 
-    readperdwarf=True,
+    readperdwarf=False,
     addnors=True, 
     readcache=True,
+    numproc=1,
+    mindec=-20
 ):
     """Process files from an input directory to select targets.
 
@@ -232,7 +234,7 @@ def select_targets(
         "/global/cfs/cdirs/cosmo/data/legacysurvey/dr9/south/sweep/9.0".
     dwarf_names : :class:`list`
         A list of dwarf galaxy names to process. Default is available dwarfs.
-    readperdwarf : :class:`bool`, optional, defaults to ``True``
+    readperdwarf : :class:`bool`, optional, defaults to ``False``
         When set, read each dwarf's data individually instead of looping
         through all possible sweeps files. This is likely quickest and
         most useful when working with a single dwarf. For multiple
@@ -249,6 +251,11 @@ def select_targets(
         files are named $TARG_DIR/streamcache/dwarfname-drX-cache.fits,
         where dwarfname is the lower-case name from `dwarf_names` and
         drX is the Legacy Surveys Data Release (parsed from `swdir`).
+    numproc : :class:`int`, optional, defaults to 1 for serial
+        The number of parallel processes to use. `numproc` of 16 is a
+        good balance between speed and file I/O.
+    mindec : :class:`float` or `int`, optional, defaults to -20 (20oS)
+        Hard limit on data (objects south of this are not returned).
 
     Returns
     -------
@@ -260,8 +267,6 @@ def select_targets(
     """
     if readperdwarf:
         # ADM loop over dwarfs and read in the data per-dwarf.
-        # ADM eventually, for multiple dwarfs, we would likely switch
-        # ADM to read in each sweep file and parallelizing across files.
         allobjs = []
         for dwarf_name in dwarf_names:
             # NRS look up the defining parameters of the dwarf.
@@ -271,15 +276,20 @@ def select_targets(
             # NRS spatial extent in degrees for initial data read.
             maxd = dwarf["MAXD"]
             # NRS read in the data.
-            objs = read_data_per_dwarf(swdir, ra0, dec0, maxd, dwarf_name,
-                                        addnors=addnors, readcache=readcache, numproc=1)
+            3objs = read_data_per_dwarf(swdir, ra0, dec0, maxd, dwarf_name,
+            3                            addnors=addnors, readcache=readcache, numproc=1)
+            objs = read_data_per_dwarf(
+                swdir, rapol, decpol, mind, maxd, stream_name, numproc=numproc,
+                mindec=mindec, addnors=addnors, readcache=readcache, readall=False
+            )
             allobjs.append(objs)
         objects = np.concatenate(allobjs)
     else:
-        # ADM --TODO-- write loop across sweeps instead of streams.
-        msg = ("readperdwarf must be True until we implement looping "
-               "over sweeps instead of dwarfs")
-        log.error(msg)
+        # ADM otherwise, read in all of the sweeps. This requires
+        # ADM some dummy inputs.
+        objects = read_data_per_dwarf(
+            swdir, 0, 0, 0, 0, "", numproc=numproc, mindec=mindec,
+            addnors=addnors, readcache=readcache, readall=True)
 
     # ADM process the targets.
     desi_target, bgs_target, mws_target, scnd_target = set_target_bits(

@@ -21,7 +21,8 @@ log = get_logger()
 gaiadr = "dr3"
 
 
-def read_data_per_dwarf_one_file(filename, ra, dec, maxd):
+def read_data_per_dwarf_one_file(filename, ra, dec, maxd,
+                                 mindec=-20., readall=False):
     """Assemble the data needed for a dwarf program from one file.
     Wrapper for desitarget.streams.io.read_data_per_stream_one_file()
 
@@ -34,6 +35,11 @@ def read_data_per_dwarf_one_file(filename, ra, dec, maxd):
     maxd : :class:`float` or `int`
         Maximum angular distance from the center of the dwarf
         coordinate system to search for members in DEGREES.
+    mindec : :class:`float` or `int`, optional, defaults to -20 (20oS)
+        Hard limit on data (objects south of this are not returned).
+    readall : :class:`bool`, optional, defaults to ``False``
+        Ignore the stream-related inputs (`decpol`, `mind`, `maxd`) and
+        instead read _all_ of the sweep files.
 
     Returns
     -------
@@ -45,7 +51,8 @@ def read_data_per_dwarf_one_file(filename, ra, dec, maxd):
 
 
 def read_data_per_dwarf(swdir, ra, dec, maxd, dwarf_name,
-                        readcache=True, addnors=True, test=False, numproc=1):
+                        readcache=True, addnors=True, test=False, numproc=1,
+                        mindec=-20, readall=False):
     """Assemble the data needed for a particular dwarf program.
     Wrapper for desitarget.streams.io.read_data_per_stream()
 
@@ -62,23 +69,28 @@ def read_data_per_dwarf(swdir, ra, dec, maxd, dwarf_name,
         coordinate system to search for members in DEGREES.
     dwarf_name : :class:`str`
         Name of a dwarf. Used to make the cached filename, e.g. "DRACO_1".
-    readcache : :class:`bool`
+    readcache : :class:`bool`, optional, defaults to ``True``
         If ``True`` read from a previously constructed and cached file
         automatically, IF such a file exists. If ``False`` don't read
         from the cache AND OVERWRITE the cached file, if it exists. The
         cached file is $TARG_DIR/streamcache/dwarfname-drX-cache.fits,
         where dwarfname is the lower-case passed `dwarf_name` and drX
         is the Legacy Surveys Data Release (parsed from `swdir`).
-    addnors : :class:`bool`
+    addnors : :class:`bool`, optional, defaults to ``True``
         If ``True`` then if `swdir` contains "north" add sweep files from
         the south by substituting "south" in place of "north" (and vice
         versa, i.e. if `swdir` contains "south" add sweep files from the
         north by substituting "north" in place of "south").
-    test : :class:`bool`
+    test : :class:`bool`, optional, defaults to ``False``
         Read a subset of the data for testing purposes.
     numproc : :class:`int`, optional, defaults to 1 for serial
         The number of parallel processes to use. `numproc` of 16 is a
         good balance between speed and file I/O.
+    mindec : :class:`float` or `int`, optional, defaults to -20 (20oS)
+        Hard limit on data (objects south of this are not returned).
+    readall : :class:`bool`, optional, defaults to ``False``
+        Ignore all of the other inputs except for `addnors` and instead
+        read (and cache) _all_ of the sweep files.
 
     Returns
     -------
@@ -93,9 +105,8 @@ def read_data_per_dwarf(swdir, ra, dec, maxd, dwarf_name,
         maxd = 4
     - The $TARG_DIR environment variable must be set to read/write from
       a cache. If $TARG_DIR is not set, caching is completely ignored.
-    - This is useful for a single dwarf. The :func:`~read_data` function
-      is likely a better choice for looping over the entire LS sweeps
-      data when targeting multiple dwarfs.
+    - This is useful for a single dwarf.
+
     """
     return read_data_per_stream(swdir, ra, dec, 0, maxd, dwarf_name,
                                 readcache=readcache, addnors=addnors, test=test, 
