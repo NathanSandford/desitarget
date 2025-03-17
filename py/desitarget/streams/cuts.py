@@ -14,6 +14,8 @@ import os
 import scipy.interpolate
 import numpy as np
 import astropy.table as atpy
+import astropy.coordinates as acoo
+import astropy.units as auni
 
 from desitarget.cuts import _psflike
 from desitarget.streams.utilities import sphere_rotate, correct_pm, rotate_pm, \
@@ -27,7 +29,7 @@ from desitarget.streams.targets import finalize
 from desiutil.log import get_logger
 log = get_logger()
 
-# CMR modified for DESI extension
+
 def is_in_GD1(objs):
     """Whether a target lies within the GD1 stellar stream.
 
@@ -53,6 +55,7 @@ def is_in_GD1(objs):
     :class:`array_like`
         ``True`` if the object is a white dwarf "FILLER" target.
     """
+    # CWR modified for DESI extension.
     # ADM start the clock.
     start = time()
 
@@ -68,41 +71,53 @@ def is_in_GD1(objs):
     # ADM the parameters that define the extent of the stream.
     mind, maxd = stream["MIND"], stream["MAXD"]
 
+    # ADM limit input coordinates to region of the stream.
+    cstream = acoo.SkyCoord(rapol*auni.degree, decpol*auni.degree)
+    cobjs = acoo.SkyCoord(objs["RA"]*auni.degree, objs["DEC"]*auni.degree)
+
+    # ADM separation between the objects of interest and the stream.
+    sep = cobjs.separation(cstream)    # ADM only retain objects in the stream based on their indexes.
+    in_stream = np.where(betw(sep.value, mind, maxd))[0]
+    isobjs = objs[in_stream]
+    log.info(f"Objects near stream: {len(in_stream)}...t={time()-start:.1f}s")
+
     # ADM rotate the position data into the coordinate system of the stream.
-    fi1, fi2 = sphere_rotate(objs['RA'], objs['DEC'], rapol, decpol, ra_ref)
+    fi1, fi2 = sphere_rotate(isobjs['RA'], isobjs['DEC'], rapol, decpol, ra_ref)
 
     # ADM distance of the stream (similar to Koposov et al. 2010 paper).
     dist = stream_distance(fi1, stream_name)
 
     # ADM/CMR REFLEX CORRECTION to proper motion.
-    xpmra, xpmdec = correct_pm(objs['RA'], objs['DEC'],
-                               objs['PMRA'], objs['PMDEC'], dist)
+    xpmra, xpmdec = correct_pm(isobjs['RA'], isobjs['DEC'],
+                               isobjs['PMRA'], isobjs['PMDEC'], dist)
 
     # ADM/CMR rotate the REFLEX-CORRECTED proper motions into the coordinate system of the stream.
-    pmfi1, pmfi2 = rotate_pm(objs['RA'], objs['DEC'], xpmra, xpmdec,
-                             rapol, decpol, ra_ref)
+    pmfi1, pmfi2 = rotate_pm(isobjs['RA'], isobjs['DEC'],
+                             xpmra, xpmdec, rapol, decpol, ra_ref)
 
     # ADM derive the combined proper motion error.
     # CMR: RMS error, appropriate for PM ~< PM_err. See Lindegren GAIA-C3-TN-LU-LL-129-01
-    pm_err = np.sqrt(0.5 * (objs["PMRA_ERROR"]**2 + objs["PMDEC_ERROR"]**2))
+    pm_err = np.sqrt(0.5 * (isobjs["PMRA_ERROR"]**2 + isobjs["PMDEC_ERROR"]**2))
 
     # ADM dust correction.
     ext_coeff = dict(g=3.237, r=2.176, z=1.217)
-    eg, er, ez = [ext_coeff[_] * objs['EBV'] for _ in 'grz']
+    eg, er, ez = [ext_coeff[_] * isobjs['EBV'] for _ in 'grz']
     ext = {}
     ext['G'] = eg
     ext['R'] = er
     ext['Z'] = ez
 
-    g, r, z = [22.5 - 2.5 * np.log10(objs['FLUX_' + _]) - ext[_] for _ in 'GRZ']
+    g, r, z = [22.5 - 2.5 * np.log10(isobjs['FLUX_' + _]) - ext[_] for _ in 'GRZ']
 
     # ADM some spline functions over which to interpolate.
     # CMR stream track in stream coordinates, phi2(phi1)
-    TRACK = scipy.interpolate.CubicSpline(stream['PHI1T'],stream['PHI2T'])
+    TRACK = scipy.interpolate.CubicSpline(stream['PHI1T'], stream['PHI2T'])
     # CMR phi1_cosphi2 proper motion trace, pm_phi1(phi1)
-    PM1TRACK = scipy.interpolate.UnivariateSpline(stream['PMPHI1_PHI1T'],stream['PMPHI1T'])
+    PM1TRACK = scipy.interpolate.UnivariateSpline(
+        stream['PMPHI1_PHI1T'], stream['PMPHI1T'])
     # CMR phi2 proper motion trace, pm_phi2(phi1)
-    PM2TRACK = scipy.interpolate.UnivariateSpline(stream['PMPHI2_PHI1T'],stream['PMPHI2T'],s=0)
+    PM2TRACK = scipy.interpolate.UnivariateSpline(
+        stream['PMPHI2_PHI1T'], stream['PMPHI2T'], s=0)
 
     # ADM create an interpolated set of phi2 coords (in stream coords).
     # CMR this is the distance, in phi2, of each star from the track phi2(phi1)
@@ -118,16 +133,17 @@ def is_in_GD1(objs):
     # CNR bright, faint and intermediate magnitude limits now in yaml file
 
     # ADM lies in the stream.
-    # CMR modified to use limits from yaml file 
-    field_sel = betw(dfi2, stream['DPHI2_MINUS'], stream['DPHI2_PLUS']) & betw(fi1, stream['PHI1_MINUS'],stream['PHI1_PLUS'])
+    # CMR modified to use limits from yaml file.
+    field_sel = betw(dfi2, stream['DPHI2_MINUS'], stream['DPHI2_PLUS'])
+    field_sel &= betw(fi1, stream['PHI1_MINUS'], stream['PHI1_PLUS'])
 
     # ADM Gaia-based selection (proper motion and parallax).
     # CMR modified to use PM_PAD and PM_NSIG from yaml file
     gaia_astrom_sel = pm12_sel_func(PM1TRACK(fi1), PM2TRACK(fi1), pmfi1, pmfi2,
-                                    pm_err, stream['PM_PAD'],stream['PM_NSIG'])
+                                    pm_err, stream['PM_PAD'], stream['PM_NSIG'])
     # CMR modified to use PLX_NSIG from yaml file
-    gaia_astrom_sel &= plx_sel_func(dist, objs, stream['PLX_NSIG'])
-    #gaia_astrom_sel &= r > stream['BRIGHT_LIMIT'] don't need this
+    gaia_astrom_sel &= plx_sel_func(dist, isobjs, stream['PLX_NSIG'])
+    # gaia_astrom_sel &= r > stream['BRIGHT_LIMIT'] CWR don't need this.
 
     # CMR magnitude ranges
     brightpm1_magsel = (r > stream['BRIGHT_LIMIT']) & (r <= stream['BRIGHTPM1_LIMIT'])
@@ -145,16 +161,16 @@ def is_in_GD1(objs):
                                & ((g - r) <= 1.1)))
     stellar_locus_red_sel = (((g - r > 1.1)
                               & betw(g - r - (1.05 + .25 * (r - z)), -.2, .2)))
-    stellar_locus_sel = stellar_locus_blue_sel | stellar_locus_red_sel   
+    stellar_locus_sel = stellar_locus_blue_sel | stellar_locus_red_sel
 
     # ADM selection for objects that lack Gaia astrometry.
     # ADM has type PSF and in a reasonable isochrone window.
-    startyp = _psflike(objs["TYPE"])
+    startyp = _psflike(isobjs["TYPE"])
     cmd_win = 0.1 + 10**(-2 + (r - 20) / 2.5)
 
     # ADM overall faint selection.
     # CMR modified to use mag limts from yaml file
-    faint_sel = ~np.isfinite(objs['PMRA']) # no PM information
+    faint_sel = ~np.isfinite(isobjs['PMRA'])  # CWR no PM information.
     faint_sel &= betw(r, stream['FAINT_NO_PM_LIMIT'], stream['FAINT_LIMIT'])
     faint_sel &= betw(np.abs(delta_cmd), 0, cmd_win)
     faint_sel &= startyp
@@ -166,7 +182,8 @@ def is_in_GD1(objs):
     common_filler_sel = betw(r, stream['BRIGHTPM2_LIMIT'], stream['FAINT_LIMIT'])
     common_filler_sel &= startyp
     common_filler_sel &= ~faint_sel
-    #common_filler_sel &= ~gaia_astrom_sel # CMR no: we want get objs with gaia astrom fainter than bright_pm3 faint lim
+    # CMR no: want objs with gaia astrom fainter than bright_pm3 faint lim.
+    # common_filler_sel &= ~gaia_astrom_sel
     common_filler_sel &= stellar_locus_sel
 
     filler_sel = common_filler_sel & betw(g - r, -.3, 1.2)
@@ -179,7 +196,7 @@ def is_in_GD1(objs):
     faint_no_pm = faint_sel & field_sel
     filler = filler_sel & field_sel & ~bright_pm1 & ~bright_pm2 & ~bright_pm3
 
-    # CMR moved these here so we write numbers of the final selections, but less useful for timing
+    # CMR moved here to write numbers of final selections, but less useful for timing.
     log.info(f"Objects meeting bright selection: {np.sum(bright_pm)}...t={time()-start:.1f}s")
     log.info(f"Objects meeting bright pm1 selection: {np.sum(bright_pm1)}...t={time()-start:.1f}s")
     log.info(f"Objects meeting bright pm2 selection: {np.sum(bright_pm2)}...t={time()-start:.1f}s")
@@ -195,8 +212,23 @@ def is_in_GD1(objs):
         msg = "Selections should be unique but they overlap!"
         log.error(msg)
 
-    return bright_pm1, bright_pm2, bright_pm3, faint_no_pm, filler
+    # ADM we sub-selected objects to just those in the stream, so we need
+    # ADM to expand back to all of the passed objects. Objects that are
+    # ADM not in the stream should be retained as False.
+    nobjs = len(objs)
+    f_bright_pm1 = np.zeros(nobjs, dtype=bool)
+    f_bright_pm2 = np.zeros(nobjs, dtype=bool)
+    f_bright_pm3 = np.zeros(nobjs, dtype=bool)
+    f_faint_no_pm = np.zeros(nobjs, dtype=bool)
+    f_filler = np.zeros(nobjs, dtype=bool)
 
+    f_bright_pm1[in_stream] = bright_pm1
+    f_bright_pm2[in_stream] = bright_pm2
+    f_bright_pm3[in_stream] = bright_pm3
+    f_faint_no_pm[in_stream] = faint_no_pm
+    f_filler[in_stream] = filler
+
+    return f_bright_pm1, f_bright_pm2, f_bright_pm3, f_faint_no_pm, f_filler
 
 
 def set_target_bits(objs, stream_names=["GD1"]):
@@ -209,7 +241,7 @@ def set_target_bits(objs, stream_names=["GD1"]):
         stream target selection. See, e.g.,
         :func:`~desitarget.stream.cuts.is_in_GD1` for column names.
     stream_names : :class:`list`
-        A list of stream names to process. Defaults to all streams.
+        A list of stream names to process. Default is available streams.
 
     Returns
     -------
@@ -232,34 +264,38 @@ def set_target_bits(objs, stream_names=["GD1"]):
     # ADM to recover the is_in() functions.
 
     # CMR updated for extension
-    if "GD1" in stream_names:
-        gd1_bright_pm1, gd1_bright_pm2, gd1_bright_pm3, gd1_faint_no_pm, gd1_filler = is_in_GD1(objs)
+    for stream in stream_names:
+        bit_name = f"MWS_{stream}"
+        func_name = f"is_in_{stream}"
+        func_call = globals()[func_name]
 
-        # CMR set mws desi extension bit
-        mws_target |= (mws_target != 0) * mws_mask.MWS_EXT
+        bright_pm1, bright_pm2, bright_pm3, faint_no_pm, filler = func_call(objs)
+
+        # ADM/CMR set mws desi extension bit
+        any_set = bright_pm1 | bright_pm2 | bright_pm3 | faint_no_pm | filler
+        mws_target |= any_set * mws_mask.MWS_EXT
         # CMR set stream name bit
-        mws_target |= (mws_target != 0) * mws_mask.MWS_GD1
+        mws_target |= any_set * mws_mask[bit_name]
         # CMR now set target subclass bit masks
-        mws_target |= gd1_bright_pm1 * mws_mask.MWS_BRIGHT_PM1
-        mws_target |= gd1_bright_pm2 * mws_mask.MWS_BRIGHT_PM2
-        mws_target |= gd1_bright_pm3 * mws_mask.MWS_BRIGHT_PM3
-        mws_target |= gd1_faint_no_pm * mws_mask.MWS_FAINT_NO_PM
-        mws_target |= gd1_filler * mws_mask.MWS_FILLER
+        mws_target |= bright_pm1 * mws_mask.MWS_BRIGHT_PM1
+        mws_target |= bright_pm2 * mws_mask.MWS_BRIGHT_PM2
+        mws_target |= bright_pm3 * mws_mask.MWS_BRIGHT_PM3
+        mws_target |= faint_no_pm * mws_mask.MWS_FAINT_NO_PM
+        mws_target |= filler * mws_mask.MWS_FILLER
 
     # ADM tell DESI_TARGET where MWS_ANY was updated.
-    # CMR updated to MWS 
+    # CMR updated to MWS.
     desi_target = (mws_target != 0) * desi_mask.MWS_ANY
 
-    # OBSOLETE: ADM set BGS_TARGET and MWS_TARGET to zeros.
-    # CMR guessed scnd_target needs to get set to zero now
+    # ADM/CMR set BGS_TARGET and SCND_TARGET to zeros.
     bgs_target = np.zeros_like(mws_target)
     scnd_target = np.zeros_like(mws_target)
 
     return desi_target, bgs_target, mws_target, scnd_target
 
 
-def select_targets(swdir, stream_names=["GD1"], readperstream=True,
-                   addnors=True, readcache=True):
+def select_targets(swdir, stream_names=["GD1"], readperstream=False,
+                   addnors=True, readcache=True, numproc=1, mindec=-20):
     """Process files from an input directory to select targets.
 
     Parameters
@@ -270,7 +306,7 @@ def select_targets(swdir, stream_names=["GD1"], readperstream=True,
         "/global/cfs/cdirs/cosmo/data/legacysurvey/dr9/south/sweep/9.0".
     stream_names : :class:`list`
         A list of stream names to process. Defaults to all streams.
-    readperstream : :class:`bool`, optional, defaults to ``True``
+    readperstream : :class:`bool`, optional, defaults to ``False``
         When set, read each stream's data individually instead of looping
         through all possible sweeps files. This is likely quickest and
         most useful when working with a single stream. For multiple
@@ -287,6 +323,11 @@ def select_targets(swdir, stream_names=["GD1"], readperstream=True,
         files are named $TARG_DIR/streamcache/streamname-drX-cache.fits,
         where streamname is the lower-case name from `stream_names` and
         drX is the Legacy Surveys Data Release (parsed from `swdir`).
+    numproc : :class:`int`, optional, defaults to 1 for serial
+        The number of parallel processes to use. `numproc` of 16 is a
+        good balance between speed and file I/O.
+    mindec : :class:`float` or `int`, optional, defaults to -20 (20oS)
+        Hard limit on data (objects south of this are not returned).
 
     Returns
     -------
@@ -298,8 +339,6 @@ def select_targets(swdir, stream_names=["GD1"], readperstream=True,
     """
     if readperstream:
         # ADM loop over streams and read in the data per-stream.
-        # ADM eventually, for multiple streams, we would likely switch
-        # ADM to read in each sweep file and parallelizing across files.
         allobjs = []
         for stream_name in stream_names:
             # ADM read in the data.
@@ -309,16 +348,18 @@ def select_targets(swdir, stream_names=["GD1"], readperstream=True,
             # ADM the parameters that define the extent of the stream.
             mind, maxd = strm["MIND"], strm["MAXD"]
             # ADM read in the data.
-            objs = read_data_per_stream(swdir, rapol, decpol, mind, maxd,
-                                        stream_name,
-                                        addnors=addnors, readcache=readcache)
+            objs = read_data_per_stream(
+                swdir, rapol, decpol, mind, maxd, stream_name, numproc=numproc,
+                mindec=mindec, addnors=addnors, readcache=readcache, readall=False
+            )
             allobjs.append(objs)
         objects = np.concatenate(allobjs)
     else:
-        # ADM --TODO-- write loop across sweeps instead of streams.
-        msg = ("readperstream must be True until we implement looping "
-               "over sweeps instead of streams")
-        log.error(msg)
+        # ADM otherwise, read in all of the sweeps. This requires
+        # ADM some dummy inputs.
+        objects = read_data_per_stream(
+            swdir, 0, 0, 0, 0, "", numproc=numproc, mindec=mindec,
+            addnors=addnors, readcache=readcache, readall=True)
 
     # ADM process the targets.
     desi_target, bgs_target, mws_target, scnd_target = set_target_bits(
@@ -346,5 +387,10 @@ def select_targets(swdir, stream_names=["GD1"], readperstream=True,
                "sweep files one-by-one (as in desitarget.cuts.select_targets()) "
                "rather than caching each individual stream")
         log.error(msg)
+
+    # ADM a final sort on RA to mitigate reproducibility issues.
+    # ADM for instance, we've had conflicting SUBPRIORITY in the past.
+    ii = np.argsort(targets)
+    targets = targets[ii]
 
     return targets
