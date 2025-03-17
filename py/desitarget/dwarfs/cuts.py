@@ -184,15 +184,18 @@ def set_target_bits(objs, dwarf_names=['BOOTES_1', 'CANES_VENATICI_1', 'DRACO_1'
     # ADM to recover the is_in() functions.
 
     # NRS loop over all dwarfs in extension
-    for dwarf_name in dwarf_names:
-        bright_pm1, bright_pm2, bright_pm3, pm_only, faint_no_pm, filler = is_in_dwarf(
-            objs, dwarf_name
+    for dwarf in dwarf_names:
+        bit_name = f"MWS_{dwarf}"
+        func_name = "is_in_dwarf"
+        func_call = globals()[func_name]
+        bright_pm1, bright_pm2, bright_pm3, pm_only, faint_no_pm, filler = func_call(
+            objs, dwarf
         )
-        all_targets = (bright_pm1 | bright_pm2 | bright_pm3 | pm_only | faint_no_pm | filler)
+        any_set = bright_pm1 | bright_pm2 | bright_pm3 | pm_only | faint_no_pm | filler
         # CMR set mws desi extension bit
-        mws_target |= (mws_target != 0) * mws_mask.MWS_EXT
+        mws_target |= any_set * mws_mask.MWS_EXT
         # NRS set dwarf name bit
-        mws_target |= all_targets * mws_mask[f"MWS_{dwarf_name}"]
+        mws_target |= any_set * mws_mask[bit_name]
         # CMR set target subclass bit masks
         mws_target |= bright_pm1 * mws_mask.MWS_BRIGHT_PM1
         mws_target |= bright_pm2 * mws_mask.MWS_BRIGHT_PM2
@@ -206,7 +209,6 @@ def set_target_bits(objs, dwarf_names=['BOOTES_1', 'CANES_VENATICI_1', 'DRACO_1'
     desi_target = (mws_target != 0) * desi_mask.MWS_ANY
 
     # OBSOLETE: ADM set BGS_TARGET and MWS_TARGET to zeros.
-    # CMR guessed scnd_target needs to get set to zero now
     bgs_target = np.zeros_like(mws_target)
     scnd_target = np.zeros_like(mws_target)
 
@@ -229,7 +231,7 @@ def select_targets(
         release for ONE of EITHER north or south, e.g.
         "/global/cfs/cdirs/cosmo/data/legacysurvey/dr9/south/sweep/9.0".
     dwarf_names : :class:`list`
-        A list of dwarf galaxy names to process. Defaults to all dwarfs.
+        A list of dwarf galaxy names to process. Default is available dwarfs.
     readperdwarf : :class:`bool`, optional, defaults to ``True``
         When set, read each dwarf's data individually instead of looping
         through all possible sweeps files. This is likely quickest and
