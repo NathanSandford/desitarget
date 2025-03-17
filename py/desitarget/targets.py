@@ -827,12 +827,8 @@ def calc_priority(targets, zcat, obscon, state=False):
         if mws_target in targets.dtype.names:
             # ADM set initial state of CALIB for potential calibration targets.
             stdnames = ('GAIA_STD_FAINT', 'GAIA_STD_WD', 'GAIA_STD_BRIGHT')
-<<<<<<< HEAD
-            extnames = ('MWS_BRIGHT_PM1', 'MWS_BRIGHT_PM2', 'MWS_BRIGHT_PM3', 'MWS_PM_ONLY', 'MWS_FAINT_NO_PM', 'MWS_FILLER')
-=======
             extnames = ('MWS_BRIGHT_PM1', 'MWS_BRIGHT_PM2', 'MWS_BRIGHT_PM3',
                         'MWS_PM_ONLY', 'MWS_FAINT_NO_PM', 'MWS_FILLER')
->>>>>>> 56ed8f17edce18b7f4c17cf365b4f75302fbcb1b
             for name in mws_mask.names():
                 # ADM only update priorities for passed observing conditions.
                 pricon = obsconditions.mask(mws_mask[name].obsconditions)
@@ -849,7 +845,6 @@ def calc_priority(targets, zcat, obscon, state=False):
                         # NUMOBS2 is when we have the min nobs for acceptable SN
                         # NUMOBS3 is after 10 observations except for PM_ONLY for which it is 2
                         # at NUMOBS2 and NUMOBS3 there is a priority reduction
-<<<<<<< HEAD
                         atnumobs1 = (
                             (zcat["NUMOBS"] > 0) # Observed >= 1 times
                             & ~done  # and not DONE
@@ -922,21 +917,6 @@ def calc_priority(targets, zcat, obscon, state=False):
                         )
                         # All targets in MWS_EXT
                         mws_ext = ((targets[mws_target] & mws_mask['MWS_EXT']) != 0)
-=======
-                        atnumobs1 = (zcat["NUMOBS"] > 0) & ~done & ((((mws_target['MWS_BRIGHT_PM1'] != 0) | (mws_target['MWS_BRIGHT_PM2'] != 0)) & (zcat["NUMOBS"] < 3)) | ((mws_target['MWS_BRIGHT_PM3'] != 0) & (zcat["NUMOBS"] < 5)))
-                        atnumobs2 = ~done & (zcat["NUMOBS"] < 10) & ((((mws_target['MWS_BRIGHT_PM1'] != 0) | (mws_target['MWS_BRIGHT_PM2'] != 0)) & (zcat["NUMOBS"] >= 3)) | ((mws_target['MWS_BRIGHT_PM3'] != 0) & (zcat["NUMOBS"] >= 5)))
-                        atnumobs3 = (~done & ((mws_target['MWS_BRIGHT_PM1'] != 0) | (mws_target['MWS_BRIGHT_PM2'] != 0) | (mws_target['MWS_BRIGHT_PM3'] != 0)) & (zcat["NUMOBS"] >= 10))
-                        # MWS_FAINT_NO_PM MWS_FILLER MWS_PM_ONLY do not use nummobs2
-                        # add threhold info for MWS_FAINT_NO_PM and MWS_FILLER
-                        atnumobs1 |= (~done & (zcat["NUMOBS"] > 0) & (zcat["NUMOBS"] < 10) & ((mws_target['MWS_FAINT_NO_PM'] != 0) | (mws_target['MWS_FILLER'] != 0)))
-                        # add MWS_PM_ONLY
-                        atnumbs1 |= (~done & (zcat["NUMOBS"] > 0) & (zcat["NUMOBS"] < 2) & (mws_target['MWS_PM_ONLY'] != 0))
-                        # add threhold info for MWS_FAINT_NO_PM and MWS_FILLER
-                        atnumobs3 |= (~done & (zcat["NUMOBS"] >= 10) & ((mws_target['MWS_FAINT_NO_PM'] != 0) | (mws_target['MWS_FILLER'] != 0)))
-                        # add MWS_PM_ONLY
-                        atnumbs3 |= (~done & (zcat["NUMOBS"] > 0) & (zcat["NUMOBS"] >= 2) & (mws_target['MWS_PM_ONLY'] != 0))
-
->>>>>>> 56ed8f17edce18b7f4c17cf365b4f75302fbcb1b
                         for sbool, sname in zip(
                                 [unobs & mws_ext, done & mws_ext, atnumobs1, atnumobs2, atnumobs3],
                                 ["UNOBS", "DONE", "MORE_NOB1", "MORE_NOB2", "MORE_NOB3"]
