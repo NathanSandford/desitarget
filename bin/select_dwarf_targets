@@ -32,15 +32,21 @@ ap.add_argument("--donotaddnors", action="store_true",
                 help=("Both the south/north LS files are read by default. Pass "
                       "this to read only the specific files in passed sweepdir")
                 )
-ap.add_argument("--donotreadperdwarf", action="store_true",
-                help=("Default is to read targets in a loop per-dwarf instead "
-                      "of in a loor per-sweeps file. Pass this to loop over "
-                      " sweep files instead of dwarfs")
+ap.add_argument("--readperdwarf", action="store_true",
+                help=("Default is to read targets by looping over all sweeps. "
+                      "Pass this to instead loop over all dwarfs.")
                 )
 ap.add_argument("--donotreadcache", action="store_true",
                 help=("Default is to read from previously cached data files "
                       "where possible. Pass this to start from scratch (and "
                       "overwrite caches). Only relevant for --readperdwarf")
+                )
+ap.add_argument("--numproc", type=int, default=1,
+                help=("Number of parallel processsess to use. numproc of 16 is a "
+                      "good balance between speed and I/I. Default to 1 for serial.")
+                )
+ap.add_argument("--mindec", type=float, default=-20,
+                help=("Hard  data limit. Objects south of this are not returned.")
                 )
 
 ns = ap.parse_args()
@@ -61,12 +67,11 @@ if dn is not None:
 
 # ADM flip the sense of some inputs.
 addnors = not(ns.donotaddnors)
-readperdwarf = not(ns.donotreadperdwarf)
 readcache = not(ns.donotreadcache)
 
 targets = cuts.select_targets(
-    ns.sweepdir, dwarf_names=dwarfnames, readperdwarf=readperdwarf,
-    addnors=addnors, readcache=readcache
+    ns.sweepdir, dwarf_names=dwarfnames, readperdwarf=ns.readperdwarf,
+    addnors=addnors, readcache=readcache, numproc=ns.numproc, mindec=ns.mindec
 )
 
 # ADM note that we hardcode for bright conditions. This could change in
