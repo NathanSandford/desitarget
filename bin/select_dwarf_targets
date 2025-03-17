@@ -76,7 +76,8 @@ targets = cuts.select_targets(
 
 # ADM note that we hardcode for bright conditions. This could change in
 # ADM the future if we add new dwarfs or programs.
+fndwarfnames = dn.replace(",", "-")
 ntargs, outfile = io.write_targets(ns.dest, targets, hdr,
-                                   dwarfnames=dn, obscon="BRIGHT")
+                                   dwarfnames=fndwarfnames, obscon="BRIGHT")
 
 log.info(f"{ntargs} targets written to {outfile}...t={time()-start:.1f}s")

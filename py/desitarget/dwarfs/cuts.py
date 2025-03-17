@@ -20,7 +20,7 @@ from desitarget.streams.targets import finalize
 from desiutil.log import get_logger
 log = get_logger()
 
-# CMR modified for DESI extension
+
 def is_in_dwarf(objs, dwarf_name):
     """Performs target selection on a source catalog for a given dwarf galaxy.
 
@@ -54,6 +54,7 @@ def is_in_dwarf(objs, dwarf_name):
     :class:`array_like`
         ``True`` if the object is a white dwarf "FILLER" target.
     """
+    # NRS modified from DESI extesion stream selection.
     # ADM start the clock.
     start = time()
     log.info(f"Starting selection for {dwarf_name}...t={time()-start:.1f}s")
@@ -79,7 +80,7 @@ def is_in_dwarf(objs, dwarf_name):
     g0_r0 = g0 - r0
     r0_z0 = r0 - z0
 
-    # NRS spatial selection; currently redundant with catalog creation
+    # NRS spatial selection; currently redundant with catalog creation.
     field_sel = spatial_sel_func(ra0, dec0, maxd, objs)
     log.info(f"Objects in the field: {field_sel.sum()}...t={time()-start:.1f}s")
 
@@ -176,14 +177,14 @@ def set_target_bits(objs, dwarf_names=['BOOTES_1', 'CANES_VENATICI_1', 'DRACO_1'
     from desitarget.targetmask import desi_mask, mws_mask
 
     # ADM set up a zerod mws_target array to |= with later.
-    # CMR changed to mws
+    # CMR changed to mws.
     mws_target = np.zeros_like(objs["RA"], dtype='int64')
 
     # ADM might be able to make this more general by putting the
     # ADM bit names in the data/yaml file and using globals()
     # ADM to recover the is_in() functions.
 
-    # NRS loop over all dwarfs in extension
+    # NRS loop over all dwarfs in extension.
     for dwarf in dwarf_names:
         bit_name = f"MWS_{dwarf}"
         func_name = "is_in_dwarf"
@@ -317,5 +318,10 @@ def select_targets(
                "sweep files one-by-one (as in desitarget.cuts.select_targets()) "
                "rather than caching each individual dwarf")
         log.error(msg)
+    
+    # ADM a final sort on RA to mitigate reproducibility issues.
+    # ADM for instance, we've had conflicting SUBPRIORITY in the past.
+    ii = np.argsort(targets)
+    targets = targets[ii]
 
     return targets
