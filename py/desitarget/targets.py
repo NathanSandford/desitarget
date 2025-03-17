@@ -827,7 +827,7 @@ def calc_priority(targets, zcat, obscon, state=False):
         if mws_target in targets.dtype.names:
             # ADM set initial state of CALIB for potential calibration targets.
             stdnames = ('GAIA_STD_FAINT', 'GAIA_STD_WD', 'GAIA_STD_BRIGHT')
-            extnames = ('MWS_BRIGTH_PM1', 'MWS_BRIGTH_PM2', 'MWS_BRIGTH_PM3', 'MWS_PM_ONLY', 'MWS_FAINT_NO_PM', 'MWS_FILLER')
+            extnames = ('MWS_BRIGHT_PM1', 'MWS_BRIGHT_PM2', 'MWS_BRIGHT_PM3', 'MWS_PM_ONLY', 'MWS_FAINT_NO_PM', 'MWS_FILLER')
             for name in mws_mask.names():
                 # ADM only update priorities for passed observing conditions.
                 pricon = obsconditions.mask(mws_mask[name].obsconditions)
@@ -836,7 +836,7 @@ def calc_priority(targets, zcat, obscon, state=False):
                     # ADM standards have no priority.
                     if name in stdnames:
                         target_state[ii] = "CALIB"
-                    # CMR  run for MWS_EXT targets
+                    # CMR run for MWS_EXT targets
                     elif name in extnames:
                         # find where BRIGHT_PM1, BRIGHT_PM2 and BRIGHT_PM3 cross
                         # threshohlds for NUMOBS1, NUMOBS2 and NUMOBS3 
@@ -844,27 +844,86 @@ def calc_priority(targets, zcat, obscon, state=False):
                         # NUMOBS2 is when we have the min nobs for acceptable SN 
                         # NUMOBS3 is after 10 observations except for PM_ONLY for which it is 2
                         # at NUMOBS2 and NUMOBS3 there is a priority reduction
-                        atnumobs1 = (zcat["NUMOBS"] > 0) & ~done &  ((((mws_target['MWS_BRIGHT_PM1'] !=0) | (mws_target['MWS_BRIGHT_PM2'] !=0)) & (zcat["NUMOBS"] < 3) ) | ((mws_target['MWS_BRIGHT_PM3'] !=0) & (zcat["NUMOBS"] < 5)))
-                        atnumobs2 = ~done & (zcat["NUMOBS"] < 10) &  ((((mws_target['MWS_BRIGHT_PM1'] !=0) | (mws_target['MWS_BRIGHT_PM2'] !=0)) & (zcat["NUMOBS"] >= 3)) | ((mws_target['MWS_BRIGHT_PM3'] !=0) & (zcat["NUMOBS"] >= 5)))
-                        atnumobs3 = (~done & ((mws_target['MWS_BRIGHT_PM1'] !=0) | (mws_target['MWS_BRIGHT_PM2'] !=0) | (mws_target['MWS_BRIGHT_PM3'] !=0)) & (zcat["NUMOBS"] >= 10))
+                        atnumobs1 = (
+                            (zcat["NUMOBS"] > 0) # Observed >= 1 times
+                            & ~done  # and not DONE
+                            & (  # and in BRIGHT_PM1 or BRIGHT_PM2 and observed < 3 times
+                                (
+                                    ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM1']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM2']) != 0)
+                                ) 
+                                & (zcat["NUMOBS"] < 3) 
+                            ) | (  # or in BRIGHT_PM3 and observed < 5 times
+                                ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM3']) != 0)
+                                & (zcat["NUMOBS"] < 5)
+                            )
+                        )
+                        atnumobs2 = (                            
+                            (zcat["NUMOBS"] < 10)  # Observed < 10 times 
+                            & ~done  # and not DONE
+                            &  (  # and in BRIGHT_PM1 or BRIGHT_PM2 and observed >= 3 times
+                                (
+                                    ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM1']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM2']) != 0)
+                                ) 
+                                & (zcat["NUMOBS"] >= 3)
+                            ) | (  # or in BRIGHT_PM3 and observed >= 5 times
+                                ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM3']) != 0)
+                                & (zcat["NUMOBS"] >= 5)
+                            )
+                        )
+                        atnumobs3 = (
+                            (zcat["NUMOBS"] >= 10)  # Observed >= 10 times 
+                            & ~done  # and not DONE
+                            & (  # and in BRIGHT_PM1, BRIGHT_PM2, or BRIGHT_PM3
+                                ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM1']) != 0)
+                                | ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM2']) != 0)
+                                | ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM3']) != 0)
+                            ) 
+                        )
                         # MWS_FAINT_NO_PM MWS_FILLER MWS_PM_ONLY do not use nummobs2 
                         # add threhold info for MWS_FAINT_NO_PM and MWS_FILLER
-                        atnumobs1 |= (~done & (zcat["NUMOBS"] > 0) & (zcat["NUMOBS"] < 10) & ((mws_target['MWS_FAINT_NO_PM'] !=0) | (mws_target['MWS_FILLER'] !=0)))
+                        atnumobs1 |= (
+                            (zcat["NUMOBS"] > 0)  # Observed >= 1 times
+                            & (zcat["NUMOBS"] < 10)  # and < 10 times 
+                            & ~done  # and not DONE
+                            & (  # and in MWS_FAINT_NO_PM or MWS_FILLER
+                                ((targets[mws_target] & mws_mask['MWS_FAINT_NO_PM']) != 0)
+                               | ((targets[mws_target] & mws_mask['MWS_FILLER']) != 0)
+                            )
+                        )
                         # add MWS_PM_ONLY
-                        atnumbs1 |= (~done & (zcat["NUMOBS"] > 0) & (zcat["NUMOBS"] < 2) & (mws_target['MWS_PM_ONLY'] !=0))
+                        atnumobs1 |= (
+                            (zcat["NUMOBS"] > 0)  # Observed >= 1 times
+                            & (zcat["NUMOBS"] < 2)  # Observed < 2 times
+                            & ~done  # and not DONE
+                            & ((targets[mws_target] & mws_mask['MWS_PM_ONLY']) != 0)  # and in MWS_PM_ONLY
+                        )
                         # add threhold info for MWS_FAINT_NO_PM and MWS_FILLER
-                        atnumobs3 |= (~done & (zcat["NUMOBS"] >= 10) & ((mws_target['MWS_FAINT_NO_PM'] !=0) | (mws_target['MWS_FILLER'] !=0)))
+                        atnumobs3 |= (
+                            (zcat["NUMOBS"] >= 10)  # Observed >= 10 times
+                            & ~done  # and not DONE
+                            & (  # and in MWS_FAINT_NO_PM or MWS_FILLER
+                                ((targets[mws_target] & mws_mask['MWS_FAINT_NO_PM']) != 0)
+                                | ((targets[mws_target] & mws_mask['MWS_FILLER']) != 0)
+                            )
+                        )
                         # add MWS_PM_ONLY
-                        atnumbs3 |= (~done & (zcat["NUMOBS"] > 0) & (zcat["NUMOBS"] >= 2) & (mws_target['MWS_PM_ONLY'] !=0))
-                        
+                        atnumobs3 |= (              
+                            (zcat["NUMOBS"] >= 2)  # Observed >= 2 times
+                            & ~done   # and not DONE
+                            & ((targets[mws_target] & mws_mask['MWS_PM_ONLY']) != 0)  # and in MWS_PM_ONLY
+                        )
+                        # All targets in MWS_EXT
+                        mws_ext = ((targets[mws_target] & mws_mask['MWS_EXT']) != 0)
                         for sbool, sname in zip(
                                 [unobs & mws_ext, done & mws_ext, atnumobs1, atnumobs2, atnumobs3],
-                                ["UNOBS", "DONE", "MORE_NOBS1", "MORE_NOBS2", "MORE_NOBS3"]
+                                ["UNOBS", "DONE", "MORE_NOB1", "MORE_NOB2", "MORE_NOB3"]
                         ):
                             # CMR use ADM's update priorities and target states.
                             Mxp = mws_mask[name].priorities[sname]
                             # CMR use ADM's update states BEFORE changing priorities.
-                            # CMR is worried about setting target_state to e.g. MORE_NOBS1
+                            # CMR is worried about setting target_state to e.g. MORE_NOB1
                             ts = "{}|{}".format(name, sname)
                             target_state[ii & sbool] = np.where(
                                 priority[ii & sbool] < Mxp, ts, target_state[ii & sbool])
