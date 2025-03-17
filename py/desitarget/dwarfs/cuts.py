@@ -277,8 +277,6 @@ def select_targets(
             # NRS spatial extent in degrees for initial data read.
             maxd = dwarf["MAXD"]
             # NRS read in the data.
-            3objs = read_data_per_dwarf(swdir, ra0, dec0, maxd, dwarf_name,
-            3                            addnors=addnors, readcache=readcache, numproc=1)
             objs = read_data_per_dwarf(
                 swdir, rapol, decpol, mind, maxd, stream_name, numproc=numproc,
                 mindec=mindec, addnors=addnors, readcache=readcache, readall=False
