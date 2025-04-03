@@ -827,7 +827,9 @@ def calc_priority(targets, zcat, obscon, state=False):
         if mws_target in targets.dtype.names:
             # ADM set initial state of CALIB for potential calibration targets.
             stdnames = ('GAIA_STD_FAINT', 'GAIA_STD_WD', 'GAIA_STD_BRIGHT')
-            extnames = ('MWS_BRIGHT_PM1', 'MWS_BRIGHT_PM2', 'MWS_BRIGHT_PM3',
+            extnames = ('MWS_STREAM_PM1', 'MWS_STREAM_PM2', 'MWS_STREAM_PM3',
+                        'MWS_DSPH_PM1', 'MWS_DSPH_PM2', 'MWS_DSPH_PM3',
+                        'MWS_UFD_PM1', 'MWS_UFD_PM2', 'MWS_UFD_PM3',
                         'MWS_PM_ONLY', 'MWS_FAINT_NO_PM', 'MWS_FILLER')
             for name in mws_mask.names():
                 # ADM only update priorities for passed observing conditions.
@@ -839,8 +841,7 @@ def calc_priority(targets, zcat, obscon, state=False):
                         target_state[ii] = "CALIB"
                     # CMR run for MWS_EXT targets
                     elif name in extnames:
-                        # find where BRIGHT_PM1, BRIGHT_PM2 and BRIGHT_PM3 cross
-                        # threshohlds for NUMOBS1, NUMOBS2 and NUMOBS3
+                        # find where PM1, PM2 and PM3 cross threshohlds for NUMOBS1, NUMOBS2 and NUMOBS3
                         # NUMOBS1 is the priority change after 1st observation
                         # NUMOBS2 is when we have the min nobs for acceptable SN
                         # NUMOBS3 is after 10 observations except for PM_ONLY for which it is 2
@@ -850,12 +851,20 @@ def calc_priority(targets, zcat, obscon, state=False):
                             & ~done  # and not DONE
                             & (  # and in BRIGHT_PM1 or BRIGHT_PM2 and observed < 3 times
                                 (
-                                    ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM1']) != 0)
-                                    | ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM2']) != 0)
+                                    ((targets[mws_target] & mws_mask['MWS_DSPH_PM1']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_DSPH_PM2']) != 0)
                                 ) 
                                 & (zcat["NUMOBS"] < 3) 
                             ) | (  # or in BRIGHT_PM3 and observed < 5 times
-                                ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM3']) != 0)
+                                (
+                                    ((targets[mws_target] & mws_mask['MWS_STREAM_PM1']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_STREAM_PM2']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_STREAM_PM3']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_UFD_PM1']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_UFD_PM2']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_UFD_PM3']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_DSPH_PM3']) != 0)
+                                )
                                 & (zcat["NUMOBS"] < 5)
                             )
                         )
@@ -864,12 +873,20 @@ def calc_priority(targets, zcat, obscon, state=False):
                             & ~done  # and not DONE
                             &  (  # and in BRIGHT_PM1 or BRIGHT_PM2 and observed >= 3 times
                                 (
-                                    ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM1']) != 0)
-                                    | ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM2']) != 0)
+                                    ((targets[mws_target] & mws_mask['MWS_DSPH_PM1']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_DSPH_PM2']) != 0)
                                 ) 
                                 & (zcat["NUMOBS"] >= 3)
                             ) | (  # or in BRIGHT_PM3 and observed >= 5 times
-                                ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM3']) != 0)
+                                (
+                                    ((targets[mws_target] & mws_mask['MWS_STREAM_PM1']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_STREAM_PM2']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_STREAM_PM3']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_UFD_PM1']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_UFD_PM2']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_UFD_PM3']) != 0)
+                                    | ((targets[mws_target] & mws_mask['MWS_DSPH_PM3']) != 0)
+                                )
                                 & (zcat["NUMOBS"] >= 5)
                             )
                         )
@@ -877,12 +894,18 @@ def calc_priority(targets, zcat, obscon, state=False):
                             (zcat["NUMOBS"] >= 10)  # Observed >= 10 times 
                             & ~done  # and not DONE
                             & (  # and in BRIGHT_PM1, BRIGHT_PM2, or BRIGHT_PM3
-                                ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM1']) != 0)
-                                | ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM2']) != 0)
-                                | ((targets[mws_target] & mws_mask['MWS_BRIGHT_PM3']) != 0)
+                                ((targets[mws_target] & mws_mask['MWS_STREAM_PM1']) != 0)
+                                | ((targets[mws_target] & mws_mask['MWS_STREAM_PM2']) != 0)
+                                | ((targets[mws_target] & mws_mask['MWS_STREAM_PM3']) != 0)
+                                | ((targets[mws_target] & mws_mask['MWS_DSPH_PM1']) != 0)
+                                | ((targets[mws_target] & mws_mask['MWS_DSPH_PM2']) != 0)
+                                | ((targets[mws_target] & mws_mask['MWS_DSPH_PM3']) != 0)
+                                | ((targets[mws_target] & mws_mask['MWS_UFD_PM1']) != 0)
+                                | ((targets[mws_target] & mws_mask['MWS_UFD_PM2']) != 0)
+                                | ((targets[mws_target] & mws_mask['MWS_UFD_PM3']) != 0)
                             ) 
                         )
-                        # MWS_FAINT_NO_PM MWS_FILLER MWS_PM_ONLY do not use nummobs2 
+                        # MWS_FAINT_NO_PM MWS_FILLER MWS_PM_ONLY do not use numobs2 
                         # add threhold info for MWS_FAINT_NO_PM and MWS_FILLER
                         atnumobs1 |= (
                             (zcat["NUMOBS"] > 0)  # Observed >= 1 times
