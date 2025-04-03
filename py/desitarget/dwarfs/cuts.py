@@ -198,12 +198,24 @@ def set_target_bits(objs, dwarf_names=['BOOTES_1', 'CANES_VENATICI_1', 'DRACO_1'
         # NRS set dwarf name bit
         mws_target |= any_set * mws_mask[bit_name]
         # CMR set target subclass bit masks
-        mws_target |= bright_pm1 * mws_mask.MWS_BRIGHT_PM1
-        mws_target |= bright_pm2 * mws_mask.MWS_BRIGHT_PM2
-        mws_target |= bright_pm3 * mws_mask.MWS_BRIGHT_PM3
         mws_target |= pm_only * mws_mask.MWS_PM_ONLY
         mws_target |= faint_no_pm * mws_mask.MWS_FAINT_NO_PM
         mws_target |= filler * mws_mask.MWS_FILLER
+        # NRS Get MWS-Ext target bit set (STREAM, DSPH, or UFD).
+        dwarf_par = get_dwarf_parameters(dwarf)
+        target_bit_set = dwarf_par["TARGET_BIT_SET"]
+        if target_bit_set == "STREAM":
+            mws_target |= bright_pm1 * mws_mask.MWS_STREAM_PM1
+            mws_target |= bright_pm2 * mws_mask.MWS_STREAM_PM2
+            mws_target |= bright_pm3 * mws_mask.MWS_STREAM_PM3
+        elif target_bit_set == "DSPH":
+            mws_target |= bright_pm1 * mws_mask.MWS_DSPH_PM1
+            mws_target |= bright_pm2 * mws_mask.MWS_DSPH_PM2
+            mws_target |= bright_pm3 * mws_mask.MWS_DSPH_PM3
+        elif target_bit_set == "UFD":
+            mws_target |= bright_pm1 * mws_mask.MWS_UFD_PM1
+            mws_target |= bright_pm2 * mws_mask.MWS_UFD_PM2
+            mws_target |= bright_pm3 * mws_mask.MWS_UFD_PM3
 
     # ADM tell DESI_TARGET where MWS_ANY was updated.
     # CMR updated to MWS 
@@ -278,7 +290,7 @@ def select_targets(
             maxd = dwarf["MAXD"]
             # NRS read in the data.
             objs = read_data_per_dwarf(
-                swdir, rapol, decpol, mind, maxd, stream_name, numproc=numproc,
+                swdir, ra0, dec0, maxd, dwarf_name, numproc=numproc,
                 mindec=mindec, addnors=addnors, readcache=readcache, readall=False
             )
             allobjs.append(objs)
@@ -287,7 +299,7 @@ def select_targets(
         # ADM otherwise, read in all of the sweeps. This requires
         # ADM some dummy inputs.
         objects = read_data_per_dwarf(
-            swdir, 0, 0, 0, 0, "", numproc=numproc, mindec=mindec,
+            swdir, 0, 0, 0, "", numproc=numproc, mindec=mindec,
             addnors=addnors, readcache=readcache, readall=True)
 
     # ADM process the targets.
