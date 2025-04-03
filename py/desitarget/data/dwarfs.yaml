@@ -29,30 +29,32 @@ BOOTES_1:
     # NRS HB r-band isochrone.
     ISO_HB_R: [2.720790000000001, 1.2116100000000003, 0.781410000000001, 0.4810099999999995, 0.42081000000000124, 0.41061000000000014, 0.3800100000000004]
     # CMR/NRS range around systemic PM for selection, mas/yr, not including errors
-    PM_PAD:  0.50
+    PM_PAD: 0.50
     # CMR number of sigma to include for PM selection
-    PM_NSIG:  2.50
+    PM_NSIG: 2.50
     # NRS systematic error floor for parallax measurements
-    PLX_SYS:  0.05
+    PLX_SYS: 0.05
     # CMR number of sigma to include for parallax selection
-    PLX_NSIG:  2.50
+    PLX_NSIG: 2.50
     # NRS magnitude selection limits
     # NRS bright r-band magnitude limit for all targets
-    BRIGHT_LIMIT:  16.00
+    BRIGHT_LIMIT: 16.00
     # NRS faint z-band magnitude limit for BRIGHTPM1 targets
-    BRIGHTPM1_LIMIT:  17.50
+    BRIGHTPM1_LIMIT: 17.50
     # NRS faint z-band magnitude limit for BRIGHTPM2 targets
-    BRIGHTPM2_LIMIT:  19.00
+    BRIGHTPM2_LIMIT: 19.00
     # NRS faint z-band magnitude limit for BRIGHTPM3 targets
-    BRIGHTPM3_LIMIT:  20.50
+    BRIGHTPM3_LIMIT: 20.50
     # NRS faint z-band magnitude limit for PM_ONLY targets
-    PM_ONLY_LIMIT:  19.00
+    PM_ONLY_LIMIT: 19.00
     # NRS bright z-band magnitude limit for FAINT_NO_PM targets
-    FAINT_NO_PM_LIMIT:  19.00
+    FAINT_NO_PM_LIMIT: 19.00
     # NRS bright z-band magnitude limit for FILLER targets
-    FILLER_LIMIT:  19.00
-    # NRS fait z-band magnitude limit for all targets
-    FAINT_LIMIT:  21.50
+    FILLER_LIMIT: 19.00
+    # NRS faint z-band magnitude limit for all targets
+    FAINT_LIMIT: 21.50
+    # NRS MWS extension target bit set to use (UFD, DSPH, or STREAM)
+    TARGET_BIT_SET: UFD
 
 # NRS the CANES_VENATICI_1 dSph.
 CANES_VENATICI_1:
@@ -83,30 +85,32 @@ CANES_VENATICI_1:
     # NRS HB r-band isochrone.
     ISO_HB_R: [2.720790000000001, 1.2116100000000003, 0.781410000000001, 0.4810099999999995, 0.42081000000000124, 0.41061000000000014, 0.3800100000000004]
     # CMR/NRS range around systemic PM for selection, mas/yr, not including errors
-    PM_PAD:  0.50
+    PM_PAD: 0.50
     # CMR number of sigma to include for PM selection
-    PM_NSIG:  2.50
+    PM_NSIG: 2.50
     # NRS systematic error floor for parallax measurements
-    PLX_SYS:  0.05
+    PLX_SYS: 0.05
     # CMR number of sigma to include for parallax selection
-    PLX_NSIG:  2.50
+    PLX_NSIG: 2.50
     # NRS magnitude selection limits
     # NRS bright r-band magnitude limit for all targets
-    BRIGHT_LIMIT:  16.00
+    BRIGHT_LIMIT: 16.00
     # NRS faint z-band magnitude limit for BRIGHTPM1 targets
-    BRIGHTPM1_LIMIT:  17.50
+    BRIGHTPM1_LIMIT: 17.50
     # NRS faint z-band magnitude limit for BRIGHTPM2 targets
-    BRIGHTPM2_LIMIT:  19.00
+    BRIGHTPM2_LIMIT: 19.00
     # NRS faint z-band magnitude limit for BRIGHTPM3 targets
-    BRIGHTPM3_LIMIT:  20.50
+    BRIGHTPM3_LIMIT: 20.50
     # NRS faint z-band magnitude limit for PM_ONLY targets
-    PM_ONLY_LIMIT:  19.00
+    PM_ONLY_LIMIT: 19.00
     # NRS bright z-band magnitude limit for FAINT_NO_PM targets
-    FAINT_NO_PM_LIMIT:  19.00
+    FAINT_NO_PM_LIMIT: 19.00
     # NRS bright z-band magnitude limit for FILLER targets
-    FILLER_LIMIT:  19.00
-    # NRS fait z-band magnitude limit for all targets
-    FAINT_LIMIT:  21.50
+    FILLER_LIMIT: 19.00
+    # NRS faint z-band magnitude limit for all targets
+    FAINT_LIMIT: 21.50
+    # NRS MWS extension target bit set to use (UFD, DSPH, or STREAM)
+    TARGET_BIT_SET: UFD
 
 # NRS the DRACO_1 dSph.
 DRACO_1:
@@ -137,30 +141,32 @@ DRACO_1:
     # NRS HB r-band isochrone.
     ISO_HB_R: [2.720790000000001, 1.2116100000000003, 0.781410000000001, 0.4810099999999995, 0.42081000000000124, 0.41061000000000014, 0.3800100000000004]
     # CMR/NRS range around systemic PM for selection, mas/yr, not including errors
-    PM_PAD:  0.50
+    PM_PAD: 0.50
     # CMR number of sigma to include for PM selection
-    PM_NSIG:  2.50
+    PM_NSIG: 2.50
     # NRS systematic error floor for parallax measurements
-    PLX_SYS:  0.05
+    PLX_SYS: 0.05
     # CMR number of sigma to include for parallax selection
-    PLX_NSIG:  2.50
+    PLX_NSIG: 2.50
     # NRS magnitude selection limits
     # NRS bright r-band magnitude limit for all targets
-    BRIGHT_LIMIT:  16.00
+    BRIGHT_LIMIT: 16.00
     # NRS faint z-band magnitude limit for BRIGHTPM1 targets
-    BRIGHTPM1_LIMIT:  17.50
+    BRIGHTPM1_LIMIT: 17.50
     # NRS faint z-band magnitude limit for BRIGHTPM2 targets
-    BRIGHTPM2_LIMIT:  19.00
+    BRIGHTPM2_LIMIT: 19.00
     # NRS faint z-band magnitude limit for BRIGHTPM3 targets
-    BRIGHTPM3_LIMIT:  20.50
+    BRIGHTPM3_LIMIT: 20.50
     # NRS faint z-band magnitude limit for PM_ONLY targets
-    PM_ONLY_LIMIT:  19.00
+    PM_ONLY_LIMIT: 19.00
     # NRS bright z-band magnitude limit for FAINT_NO_PM targets
-    FAINT_NO_PM_LIMIT:  19.00
+    FAINT_NO_PM_LIMIT: 19.00
     # NRS bright z-band magnitude limit for FILLER targets
-    FILLER_LIMIT:  19.00
-    # NRS fait z-band magnitude limit for all targets
-    FAINT_LIMIT:  21.50
+    FILLER_LIMIT: 19.00
+    # NRS faint z-band magnitude limit for all targets
+    FAINT_LIMIT: 21.50
+    # NRS MWS extension target bit set to use (UFD, DSPH, or STREAM)
+    TARGET_BIT_SET: DSPH
 
 # NRS the SEXTANS_1 dSph.
 SEXTANS_1:
@@ -191,30 +197,32 @@ SEXTANS_1:
     # NRS HB r-band isochrone.
     ISO_HB_R: [2.720790000000001, 1.2116100000000003, 0.781410000000001, 0.4810099999999995, 0.42081000000000124, 0.41061000000000014, 0.3800100000000004]
     # CMR/NRS range around systemic PM for selection, mas/yr, not including errors
-    PM_PAD:  0.50
+    PM_PAD: 0.50
     # CMR number of sigma to include for PM selection
-    PM_NSIG:  2.50
+    PM_NSIG: 2.50
     # NRS systematic error floor for parallax measurements
-    PLX_SYS:  0.05
+    PLX_SYS: 0.05
     # CMR number of sigma to include for parallax selection
-    PLX_NSIG:  2.50
+    PLX_NSIG: 2.50
     # NRS magnitude selection limits
     # NRS bright r-band magnitude limit for all targets
-    BRIGHT_LIMIT:  16.00
+    BRIGHT_LIMIT: 16.00
     # NRS faint z-band magnitude limit for BRIGHTPM1 targets
-    BRIGHTPM1_LIMIT:  17.50
+    BRIGHTPM1_LIMIT: 17.50
     # NRS faint z-band magnitude limit for BRIGHTPM2 targets
-    BRIGHTPM2_LIMIT:  19.00
+    BRIGHTPM2_LIMIT: 19.00
     # NRS faint z-band magnitude limit for BRIGHTPM3 targets
-    BRIGHTPM3_LIMIT:  20.50
+    BRIGHTPM3_LIMIT: 20.50
     # NRS faint z-band magnitude limit for PM_ONLY targets
-    PM_ONLY_LIMIT:  19.00
+    PM_ONLY_LIMIT: 19.00
     # NRS bright z-band magnitude limit for FAINT_NO_PM targets
-    FAINT_NO_PM_LIMIT:  19.00
+    FAINT_NO_PM_LIMIT: 19.00
     # NRS bright z-band magnitude limit for FILLER targets
-    FILLER_LIMIT:  19.00
-    # NRS fait z-band magnitude limit for all targets
-    FAINT_LIMIT:  21.50
+    FILLER_LIMIT: 19.00
+    # NRS faint z-band magnitude limit for all targets
+    FAINT_LIMIT: 21.50
+    # NRS MWS extension target bit set to use (UFD, DSPH, or STREAM)
+    TARGET_BIT_SET: DSPH
 
 # NRS the URSA_MINOR_1 dSph.
 URSA_MINOR_1:
@@ -245,27 +253,29 @@ URSA_MINOR_1:
     # NRS HB r-band isochrone.
     ISO_HB_R: [2.720790000000001, 1.2116100000000003, 0.781410000000001, 0.4810099999999995, 0.42081000000000124, 0.41061000000000014, 0.3800100000000004]
     # CMR/NRS range around systemic PM for selection, mas/yr, not including errors
-    PM_PAD:  0.50
+    PM_PAD: 0.50
     # CMR number of sigma to include for PM selection
-    PM_NSIG:  2.50
+    PM_NSIG: 2.50
     # NRS systematic error floor for parallax measurements
-    PLX_SYS:  0.05
+    PLX_SYS: 0.05
     # CMR number of sigma to include for parallax selection
-    PLX_NSIG:  2.50
+    PLX_NSIG: 2.50
     # NRS magnitude selection limits
     # NRS bright r-band magnitude limit for all targets
-    BRIGHT_LIMIT:  16.00
+    BRIGHT_LIMIT: 16.00
     # NRS faint z-band magnitude limit for BRIGHTPM1 targets
-    BRIGHTPM1_LIMIT:  17.50
+    BRIGHTPM1_LIMIT: 17.50
     # NRS faint z-band magnitude limit for BRIGHTPM2 targets
-    BRIGHTPM2_LIMIT:  19.00
+    BRIGHTPM2_LIMIT: 19.00
     # NRS faint z-band magnitude limit for BRIGHTPM3 targets
-    BRIGHTPM3_LIMIT:  20.50
+    BRIGHTPM3_LIMIT: 20.50
     # NRS faint z-band magnitude limit for PM_ONLY targets
-    PM_ONLY_LIMIT:  19.00
+    PM_ONLY_LIMIT: 19.00
     # NRS bright z-band magnitude limit for FAINT_NO_PM targets
-    FAINT_NO_PM_LIMIT:  19.00
+    FAINT_NO_PM_LIMIT: 19.00
     # NRS bright z-band magnitude limit for FILLER targets
-    FILLER_LIMIT:  19.00
-    # NRS fait z-band magnitude limit for all targets
-    FAINT_LIMIT:  21.50
+    FILLER_LIMIT: 19.00
+    # NRS faint z-band magnitude limit for all targets
+    FAINT_LIMIT: 21.50
+    # NRS MWS extension target bit set to use (UFD, DSPH, or STREAM)
+    TARGET_BIT_SET: DSPH
