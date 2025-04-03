@@ -38,7 +38,7 @@ def read_data_per_dwarf_one_file(filename, ra, dec, maxd,
     mindec : :class:`float` or `int`, optional, defaults to -20 (20oS)
         Hard limit on data (objects south of this are not returned).
     readall : :class:`bool`, optional, defaults to ``False``
-        Ignore the stream-related inputs (`decpol`, `mind`, `maxd`) and
+        Ignore the dwarf-related inputs (`ra`, `dec`, `maxd`) and
         instead read _all_ of the sweep files.
 
     Returns
