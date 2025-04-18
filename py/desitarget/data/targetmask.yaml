@@ -109,8 +109,8 @@ mws_mask:
     - [MWS_FAINT_RED_SOUTH, 19, "Milky Way Survey faint extension, red side (DECam)",         {obsconditions: BRIGHT}]
     - [MWS_EXT,             20, "DESI Extension stream or dSph target",                       {obsconditions: BRIGHT}]
     - [MWS_STREAM_PM1,      21, "DESI Extension stream Gaia selection, 16<r<17.5",            {obsconditions: BRIGHT}]
-    - [MWS_STREAM_PM2,      22, "DESI Extension stream Gaia selection, 17.5<r<19",            {obsconditions: BRIGHT}]
-    - [MWS_STREAM_PM3,      23, "DESI Extension stream Gaia selection, 19<r<20.5",            {obsconditions: BRIGHT}]
+    - [MWS_STREAM_PM2,      22, "DESI Extension stream Gaia selection, 17.5<r<19",             {obsconditions: BRIGHT}]
+    - [MWS_STREAM_PM3,      23, "DESI Extension stream Gaia selection, 19<r<20.5",             {obsconditions: BRIGHT}]
     - [MWS_DSPH_PM1,        24, "DESI Extension dSph Gaia selection, 16<r<17.5",              {obsconditions: BRIGHT}]
     - [MWS_DSPH_PM2,        25, "DESI Extension dSph Gaia selection, 17.5<r<19",              {obsconditions: BRIGHT}]
     - [MWS_DSPH_PM3,        26, "DESI Extension dSph Gaia selection, 19<r<20.5",              {obsconditions: BRIGHT}]
@@ -120,12 +120,12 @@ mws_mask:
     - [MWS_PM_ONLY,         30, "DESI Extension Gaia selection Gaia only, no cmd",            {obsconditions: BRIGHT}]
     - [MWS_FAINT_NO_PM,     31, "DESI Extension, no Gaia data available",                     {obsconditions: BRIGHT}]
     - [MWS_FILLER,          32, "DESI Extension filler target on stream or dSph tiles",       {obsconditions: BRIGHT}]
-
+    
     # ADM Standard stars based only on Gaia.
     - [GAIA_STD_FAINT,      33, "Standard stars for dark/gray conditions",   {obsconditions: DARK|BACKUP|TWILIGHT12|TWILIGHT18}]
     - [GAIA_STD_WD,         34, "White Dwarf stars",                         {obsconditions: DARK|BRIGHT|BACKUP|TWILIGHT12|TWILIGHT18}]
     - [GAIA_STD_BRIGHT,     35, "Standard stars for BRIGHT conditions",      {obsconditions: BRIGHT|BACKUP|TWILIGHT12|TWILIGHT18}]
-    
+
     - [MWS_GD1,             36, "DESI Extension GD1 stream target",                           {obsconditions: BRIGHT}]
     - [MWS_ORPHAN,          37, "DESI Extension Orphan-Chenab stream target",                 {obsconditions: BRIGHT}]
     - [MWS_BOOTES_1,        38, "DESI Extension Bootes I dSph target",                        {obsconditions: BRIGHT}]
@@ -393,13 +393,13 @@ priorities:
         MWS_PM_ONLY:                  {UNOBS: 1650, MORE_NOB1: 1649, MORE_NOB2: 1649, MORE_NOB3: 1639, DONE: 2, OBS: 1, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
         MWS_FAINT_NO_PM:              {UNOBS: 1640, MORE_NOB1: 1641, MORE_NOB2: 1641, MORE_NOB3: 1639, DONE: 2, OBS: 1, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
         MWS_FILLER:                   {UNOBS: 1630, MORE_NOB1: 1631, MORE_NOB2: 1631, MORE_NOB3: 2, DONE: 2, OBS: 1, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
-        MWS_GD1:                      {UNOBS: 0, MORE_NOBS1: 0, MORE_NOBS2: 0, MORE_NOBS3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
-        MWS_ORPHAN:                   {UNOBS: 0, MORE_NOBS1: 0, MORE_NOBS2: 0, MORE_NOBS3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
-        MWS_BOOTES_1:                 {UNOBS: 0, MORE_NOBS1: 0, MORE_NOBS2: 0, MORE_NOBS3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
-        MWS_CANES_VENATICI_1:         {UNOBS: 0, MORE_NOBS1: 0, MORE_NOBS2: 0, MORE_NOBS3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
-        MWS_DRACO_1:                  {UNOBS: 0, MORE_NOBS1: 0, MORE_NOBS2: 0, MORE_NOBS3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
-        MWS_SEXTANS_1:                {UNOBS: 0, MORE_NOBS1: 0, MORE_NOBS2: 0, MORE_NOBS3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
-        MWS_URSA_MINOR_1:             {UNOBS: 0, MORE_NOBS1: 0, MORE_NOBS2: 0, MORE_NOBS3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
+        MWS_GD1:                      {UNOBS: 0, MORE_NOB1: 0, MORE_NOB2: 0, MORE_NOB3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
+        MWS_ORPHAN:                   {UNOBS: 0, MORE_NOB1: 0, MORE_NOB2: 0, MORE_NOB3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
+        MWS_BOOTES_1:                 {UNOBS: 0, MORE_NOB1: 0, MORE_NOB2: 0, MORE_NOB3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
+        MWS_CANES_VENATICI_1:         {UNOBS: 0, MORE_NOB1: 0, MORE_NOB2: 0, MORE_NOB3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
+        MWS_DRACO_1:                  {UNOBS: 0, MORE_NOB1: 0, MORE_NOB2: 0, MORE_NOB3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
+        MWS_SEXTANS_1:                {UNOBS: 0, MORE_NOB1: 0, MORE_NOB2: 0, MORE_NOB3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
+        MWS_URSA_MINOR_1:             {UNOBS: 0, MORE_NOB1: 0, MORE_NOB2: 0, MORE_NOB3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
 
 # ADM backup targets.
         BACKUP_DIB:                   {UNOBS: 45, MORE_ZGOOD: 2, MORE_ZWARN: 2, DONE: 2, OBS: 1, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
@@ -595,7 +595,7 @@ numobs:
         UDG:                    1
         FIRST_MALS:             1
         QSO_RED:                4
-#       MWS_DDOGIANTS:          1s
+#       MWS_DDOGIANTS:          1
         MWS_CLUS_GAL_DEEP:      1
         LOW_MASS_AGN:           1
         FAINT_HPM:              1
