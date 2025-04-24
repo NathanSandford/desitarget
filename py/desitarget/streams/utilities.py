@@ -411,9 +411,9 @@ def get_targthing_parameters(targthing_name):
         stream = yaml.safe_load(f)
     streamlist = list(stream.keys())
     fn2 = resources.files('desitarget').joinpath('data/dwarfs.yaml')
-#    with open(fn2) as f:
-#        dwarf = yaml.safe_load(f)
-#    dwarflist = list(dwarf.keys())
+    with open(fn2) as f:
+        dwarf = yaml.safe_load(f)
+    dwarflist = list(dwarf.keys())
 
     if targthing_name in streamlist:
         return stream[targthing_name]
@@ -872,6 +872,8 @@ def cmd_sel_func(
     magoff = dwarf["MAGOFF"]
     # retrieve coefficients for the rmag - rmagerr linear fit
     rmag_rmagerr_coeffs = np.array(dwarf["RMAG_RMAGERR_COEFFS"])
+    def log10_error_func(x, a, b):
+        return a * x + b
 
     # apply isochrone offsets
     iso_rgb_gr = iso_rgb_g - iso_rgb_r
