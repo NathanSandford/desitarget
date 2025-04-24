@@ -808,8 +808,7 @@ def cmd_sel_func(
     rgb_rmin=16, rgb_rmax=23,
     hb_color_tol=0.1, hb_mag_tol=0.5,
     hb_grmin=-0.5, hb_grmax=0.5,
-    hb_rmin=16, hb_rmax=23,
-    show_magerr_plot=False
+    hb_rmin=16, hb_rmax=23
 ):
     """Select dwarf galaxy members using CMD cuts.
 
@@ -871,6 +870,8 @@ def cmd_sel_func(
     # retrieve the color and magnitude offsets.
     coloff = dwarf["COLOFF"]
     magoff = dwarf["MAGOFF"]
+    # retrieve coefficients for the rmag - rmagerr linear fit
+    rmag_rmagerr_coeffs = np.array(dwarf["RMAG_RMAGERR_COEFFS"])
 
     # apply isochrone offsets
     iso_rgb_gr = iso_rgb_g - iso_rgb_r
@@ -889,32 +890,10 @@ def cmd_sel_func(
     r0 = r - er
     z0 = z - ez
 
-    # fit log10(rmag error) vs rmag relation
-    def log10_error_func(x, a, b):
-        return a * x + b
-    popt, pcov = curve_fit(
-        log10_error_func,
-        r[betw(r, 15, 24) & betw(np.log10(rerr), -4, 0)],
-        np.log10(rerr)[betw(r, 15, 24) & betw(np.log10(rerr), -4, 0)]
-    )
-    if show_magerr_plot:
-        plt.figure(figsize=(5, 5))
-        plt.scatter(
-            r[betw(r, 15, 24) & betw(np.log10(rerr), -4, 0)],
-            np.log10(rerr)[betw(r, 15, 24) & betw(np.log10(rerr), -4, 0)],
-            marker='.',
-            alpha=0.1,
-            c='k'
-        )
-        xdata = np.linspace(15, 24, 100)
-        plt.plot(xdata, log10_error_func(xdata, *popt))
-        plt.xlabel("rmag")
-        plt.ylabel("log10(rmagerr)")
-        plt.show()
     # magnitude cut along RGB
     mag_sel_rgb = betw(r0, np.min(iso_rgb_r + dm) - 0.5, rgb_rmax) & betw(g0 - r0, rgb_grmin, rgb_grmax)
     # color cut along RGB
-    rgb_color_tol = np.sqrt(rgb_color_tol**2 + (3*10**log10_error_func(iso_rgb_r + dm, *popt))**2)
+    rgb_color_tol = np.sqrt(rgb_color_tol**2 + (3*10**log10_error_func(iso_rgb_r + dm, *rmag_rmagerr_coeffs))**2)
     grmax1 = np.interp(r0, iso_rgb_r[::-1] + dm, iso_rgb_gr[::-1] + rgb_color_tol[::-1], left=None, right=None)
     grmax2 = np.interp(r0, iso_rgb_r[::-1] + dm + rgb_mag_tol, iso_rgb_gr[::-1] + rgb_color_tol[::-1], left=None, right=None)
     grmax3 = np.interp(r0, iso_rgb_r[::-1] + dm - rgb_mag_tol, iso_rgb_gr[::-1] + rgb_color_tol[::-1], left=None, right=None)
