@@ -654,7 +654,7 @@ def set_target_bits(objs, targthing_names=["GD1", "BOOTES_1"]):
             objs, targthing)
             
         # ADM/CMR set mws desi extension bit
-        any_set = bright_pm1 | bright_pm2 | bright_pm3 | faint_no_pm | filler
+        any_set = bright_pm1 | bright_pm2 | bright_pm3 | pm_only | faint_no_pm | filler
         mws_target |= any_set * mws_mask.MWS_EXT
         # CMR set stream name bit
         mws_target |= any_set * mws_mask[bit_name]
