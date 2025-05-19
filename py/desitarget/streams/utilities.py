@@ -991,26 +991,24 @@ def sort_targmwext_by_rank(in_targmwextlist):
     
     return out_targmwextlist
     
-def targmwext_resolve(targmwext_name, mws_target, ibright_pm1, ibright_pm2, ibright_pm3, ipm_only,
-                      ifaint_no_pm, ifaint_cmd, ifiller):
+def targmwext_resolve(targmwext_name, mws_target, ibright_pm1, ibright_pm2, ibright_pm3, ipm_only, ifaint_cmd, ifiller):
     """Resolve ambiguity with target subclass bits in the mwstarget mask 
-       using TARGMWEXT_RANK from the yaml file. Smaller numbers are  higher priority.
+       using TARGMWEXT_RANK from the yaml file. Smaller numbers are higher priority.
        Streams and dwarfs are selected in rank order and targets selected for lower ranking
        streams that are also selected in higher ranking dwarfs are only selected if their
        target subclass outranks the target subclass they were selected as for the higher ranking
        object.  All dwarfs outrank streams. GD1 is the highest ranking stream, Orphan the second.
-       Ranking of subtarget classes: bright_pm1, bright_pm2, bright_pm3, pm_only, faint_no_pm, faint_cmd, filler
+       Ranking of subtarget classes: bright_pm1, bright_pm2, bright_pm3, pm_only, faint_cmd, filler
        We make assumptions, which avoid the brute-force implementation of these priorities:
        - brightpm[123] never overlap in magnitude, so an object can't be, e.g., pm1 and pm2 in different stream/dwarfs
        - pm_only can only overlap with brightpm[12]
-       - faint_no_pm and faint_cmd are never used in the same stream/dwarf
-       - faint_no_pm, faint_cmd and filler can only overlap with each other and bright_pm3 
+       - faint_cmd and filler can only overlap with each other and bright_pm3 
 
-       The bright_pm1, bright_pm2 and bright_pm3 and pm_only outrank faint_cmd, faint_no_pm and filler. 
+       The bright_pm1, bright_pm2 and bright_pm3 and pm_only outrank faint_cmd and filler. 
        The only overlaps possible and their relative rankings are: 
-       1) bright_pm3 outranks faint_no_pm, faint_cmd and filler. bright_pm1 and bright_pm2 are too bright
+       1) bright_pm3 outranks faint_cmd and filler. bright_pm1 and bright_pm2 are too bright
           to overlap with either of the faint selections. 
-       2) faint_no_pm and faint_cmd outrank filler.
+       2) faint_cmd outranks filler.
        3) pm_only can only overlap bright_pm1 and bright_pm2 (and it is only used for dwarfs)
        Note that the mangnitude ranges of bright_pm[123] are always the same so that, e.g., 
        bright_pm1 and  bright_pm2 can neve be set for the same object.  
@@ -1030,10 +1028,8 @@ def targmwext_resolve(targmwext_name, mws_target, ibright_pm1, ibright_pm2, ibri
         Numpy 1d array, ``True`` for objects that pass the bright_pm3 selection criteria 
     ipm_only : :class:`array_like` or `boolean`
         Numpy 1d array, ``True`` for objects that pass pm_only. Use for dwarfs but not streams
-    ifaint_no_pm : :class:`array_like` or `boolean`
-        Numpy 1d array, ``True`` for objects that pass faint_no_pm. Use for dwarfs but not streams
     ifaint_cmd : :class:`array_like` or `boolean`
-        Numpy 1d array, ``True`` for objects that pass faint_cmd. Use for streams but not dwarfs
+        Numpy 1d array, ``True`` for objects that pass faint_cmd selection criteria
     ifiller : :class:`array_like` or `boolean`
         Numpy 1d array, ``True`` for objects that pass the filler selection criteria  
 
@@ -1048,8 +1044,6 @@ def targmwext_resolve(targmwext_name, mws_target, ibright_pm1, ibright_pm2, ibri
     :class:`array_like`
         ``True`` if the object is a "PM_ONLY" target and has priorty for duplicates
     :class:`array_like`
-        ``True`` if the object is a "FAINT_NO_PM" target and has priorty for duplicates
-    :class:`array_like`
         ``True`` if the object is a "FAINT_CMD" target and has priorty for duplicates
     :class:`array_like`
         ``True`` if the object is a "FILLER" target and has priorty for duplicates
@@ -1061,7 +1055,7 @@ def targmwext_resolve(targmwext_name, mws_target, ibright_pm1, ibright_pm2, ibri
     from desitarget.targetmask import mws_mask
 
     # target bits set selecting the current stream or dwarf 
-    any_set_here = ibright_pm1 | ibright_pm2 | ibright_pm3 | ipm_only | ifaint_no_pm | ifaint_cmd | ifiller
+    any_set_here = ibright_pm1 | ibright_pm2 | ibright_pm3 | ipm_only | ifaint_cmd | ifiller
     # target bits set when selecting streams and dwarfs that rank higher than this one
     any_set_prev = mws_target & mws_mask['MWS_EXT']
     # look for objects selected in this stream that were also previously targeted
@@ -1129,23 +1123,17 @@ def targmwext_resolve(targmwext_name, mws_target, ibright_pm1, ibright_pm2, ibri
                 iduppmonlybrightpm2 = iicheckdups & ibrightpm2bit & ipm_only
                 if np.sum(iduppmonlybrightpm2) > 0:
                     ipmonly[iduppmonlybrightpm2 != 0] = 0
-                # our lower ranked object can't set faint_cmd or faint_no_pm or filler 
+                # our lower ranked object can't set faint_cmd or filler 
                 # if the higher ranked one has set bright_pm3
                 idupbrightpm3faintcmd = iicheckdups & brightpm3bit & ifaint_cmd  
                 if np.sum(idupbrightpm3faintcmd) > 0:
                     ifaint_cmd[idupbrightpm3faintcmd != 0] = 0
-                idupbrightpm3faintnopm = iicheckdups & brightpm3bit & ifaint_no_pm  
-                if np.sum(idupbrightpm3faintnopm) > 0:
-                    ifaint_no_pm[idupbrightpm3faintnopm != 0] = 0
                 idupbrightpm3filler = iicheckdups & brigthpm3bit & ifiller  
                 if np.sum(idupbrightpm3filler) > 0:
                     ifiller[idupbrightpm3filler != 0] = 0
-                # our lower ranked objectd cannot set filler if the higher ranked one set faint_no_pm or faint_cmd
-                idupfaintnopmfiller = iicheckdups & mws_mask['MWS_FAINT_NO_PM'] & ifiller
-                if np.sum(idupfaintnopmfiller) > 0:
-                    ifiller[idupfaintnopmfiller !=0] = 0
-                idupfaintcmdfiller = iicheckdups & mws_mask['FAINT_NO_PM'] & ifiller
+                # our lower ranked objectd cannot set filler if the higher ranked one set faint_cmd
+                idupfaintcmdfiller = iicheckdups & mws_mask['MWS_FAINT_CMD'] & ifiller
                 if np.sum(idupfaintcmdfiller) > 0:
                     ifiller[idupfaintcmdfiller !=0] = 0
                     
-    return ibright_pm1, ibright_pm2, ibright_pm3, ipm_only, ifaint_no_pm, ifaint_cmd, ifiller
+    return ibright_pm1, ibright_pm2, ibright_pm3, ipm_only, ifaint_cmd, ifiller
