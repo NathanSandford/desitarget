@@ -830,7 +830,7 @@ def calc_priority(targets, zcat, obscon, state=False):
             extnames = ('MWS_STREAM_PM1', 'MWS_STREAM_PM2', 'MWS_STREAM_PM3',
                         'MWS_DSPH_PM1', 'MWS_DSPH_PM2', 'MWS_DSPH_PM3',
                         'MWS_UFD_PM1', 'MWS_UFD_PM2', 'MWS_UFD_PM3',
-                        'MWS_PM_ONLY', 'MWS_FAINT_NO_PM', 'MWS_FILLER')
+                        'MWS_PM_ONLY', 'MWS_FAINT_CMD', 'MWS_FILLER')
             for name in mws_mask.names():
                 # ADM only update priorities for passed observing conditions.
                 pricon = obsconditions.mask(mws_mask[name].obsconditions)
@@ -933,13 +933,13 @@ def calc_priority(targets, zcat, obscon, state=False):
                                 | ((targets[mws_target] & mws_mask['MWS_UFD_PM3']) != 0) 
                             )                          
                         )
-                        # MWS_FAINT_NO_PM, MWS_FILLER, MWS_PM_ONLY do not use nummobs2
-                        atnumobs1 |= (  # (MWS_FAINT_NO_PM or MWS_FILLER, 0 < NUMOBS < 10, not DONE)
+                        # MWS_FAINT_CMD, MWS_FILLER, MWS_PM_ONLY do not use nummobs2
+                        atnumobs1 |= (  # (MWS_FAINT_CMD or MWS_FILLER, 0 < NUMOBS < 10, not DONE)
                             (zcat["NUMOBS"] > 0)  # NUMOBS > 0
                             & (zcat["NUMOBS"] < 10)  # NUMOBS < 10
                             & ~done  # and not DONE
-                            & (  # and MWS_FAINT_NO_PM or MWS_FILLER
-                                ((targets[mws_target] & mws_mask['MWS_FAINT_NO_PM']) != 0) 
+                            & (  # and MWS_FAINT_CMD or MWS_FILLER
+                                ((targets[mws_target] & mws_mask['MWS_FAINT_CMD']) != 0) 
                                 | ((targets[mws_target] & mws_mask['MWS_FILLER']) != 0)
                             )
                         )
@@ -949,11 +949,11 @@ def calc_priority(targets, zcat, obscon, state=False):
                             & ~done  # and not DONE
                             & ((targets[mws_target] & mws_mask['MWS_PM_ONLY']) != 0)  # and MWS_PM_ONLY
                         )
-                        atnumobs3 |= (  # (MWS_FAINT_NO_PM or MWS_FILLER, NUMOBS >= 10, not DONE)
+                        atnumobs3 |= (  # (MWS_FAINT_CMD or MWS_FILLER, NUMOBS >= 10, not DONE)
                             (zcat["NUMOBS"] >= 10)  # NUMOBS >= 10
                             & ~done  # and not DONE
-                            & (  # and MWS_FAINT_NO_PM or MWS_FILLER
-                                ((targets[mws_target] & mws_mask['MWS_FAINT_NO_PM']) != 0) 
+                            & (  # and MWS_FAINT_CMD or MWS_FILLER
+                                ((targets[mws_target] & mws_mask['MWS_FAINT_CMD']) != 0) 
                                 | ((targets[mws_target] & mws_mask['MWS_FILLER']) != 0)
                             )
                         )

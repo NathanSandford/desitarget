@@ -109,8 +109,8 @@ mws_mask:
     - [MWS_FAINT_RED_SOUTH, 19, "Milky Way Survey faint extension, red side (DECam)",         {obsconditions: BRIGHT}]
     - [MWS_EXT,             20, "DESI Extension stream or dSph target",                       {obsconditions: BRIGHT}]
     - [MWS_STREAM_PM1,      21, "DESI Extension stream Gaia selection, 16<r<17.5",            {obsconditions: BRIGHT}]
-    - [MWS_STREAM_PM2,      22, "DESI Extension stream Gaia selection, 17.5<r<19",             {obsconditions: BRIGHT}]
-    - [MWS_STREAM_PM3,      23, "DESI Extension stream Gaia selection, 19<r<20.5",             {obsconditions: BRIGHT}]
+    - [MWS_STREAM_PM2,      22, "DESI Extension stream Gaia selection, 17.5<r<19",            {obsconditions: BRIGHT}]
+    - [MWS_STREAM_PM3,      23, "DESI Extension stream Gaia selection, 19<r<20.5",            {obsconditions: BRIGHT}]
     - [MWS_DSPH_PM1,        24, "DESI Extension dSph Gaia selection, 16<r<17.5",              {obsconditions: BRIGHT}]
     - [MWS_DSPH_PM2,        25, "DESI Extension dSph Gaia selection, 17.5<r<19",              {obsconditions: BRIGHT}]
     - [MWS_DSPH_PM3,        26, "DESI Extension dSph Gaia selection, 19<r<20.5",              {obsconditions: BRIGHT}]
@@ -118,7 +118,7 @@ mws_mask:
     - [MWS_UFD_PM2,         28, "DESI Extension dSph Gaia selection, 17.5<r<19",              {obsconditions: BRIGHT}]
     - [MWS_UFD_PM3,         29, "DESI Extension dSph Gaia selection, 19<r<20.5",              {obsconditions: BRIGHT}]
     - [MWS_PM_ONLY,         30, "DESI Extension Gaia selection Gaia only, no cmd",            {obsconditions: BRIGHT}]
-    - [MWS_FAINT_NO_PM,     31, "DESI Extension, no Gaia data available",                     {obsconditions: BRIGHT}]
+    - [MWS_FAINT_CMD,       31, "DESI Extension cmd selection only, no Gaia info",            {obsconditions: BRIGHT}]
     - [MWS_FILLER,          32, "DESI Extension filler target on stream or dSph tiles",       {obsconditions: BRIGHT}]
     
     # ADM Standard stars based only on Gaia.
@@ -133,7 +133,6 @@ mws_mask:
     - [MWS_DRACO_1,         40, "DESI Extension Draco dSph target",                           {obsconditions: BRIGHT}]
     - [MWS_SEXTANS_1,       41, "DESI Extension Sextans  dSph target",                        {obsconditions: BRIGHT}]
     - [MWS_URSA_MINOR_1,    42, "DESI Extension Ursa Minor  dSph target",                     {obsconditions: BRIGHT}]
-    - [MWS_FAINT_CMD,       43, "DESI Extension cmd selection only, no Gaia info",            {obsconditions: BRIGHT}]
     
     # ADM back-up targets for poor conditions and as filler.
     - [BACKUP_DIB,          57, "Diffuse interstellar bands (project 398)",  {obsconditions: BACKUP|TWILIGHT12|TWILIGHT18}]
@@ -392,7 +391,6 @@ priorities:
         MWS_UFD_PM2:                  {UNOBS: 1680, MORE_NOB1: 1681, MORE_NOB2: 1670, MORE_NOB3: 1639, DONE: 2, OBS: 1, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
         MWS_UFD_PM3:                  {UNOBS: 1660, MORE_NOB1: 1663, MORE_NOB2: 1662, MORE_NOB3: 1639, DONE: 2, OBS: 1, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
         MWS_PM_ONLY:                  {UNOBS: 1650, MORE_NOB1: 1649, MORE_NOB2: 1649, MORE_NOB3: 1639, DONE: 2, OBS: 1, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
-        MWS_FAINT_NO_PM:              {UNOBS: 1640, MORE_NOB1: 1641, MORE_NOB2: 1641, MORE_NOB3: 1639, DONE: 2, OBS: 1, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
         MWS_FAINT_CMD:                {UNOBS: 1640, MORE_NOB1: 1641, MORE_NOB2: 1641, MORE_NOB3: 1639, DONE: 2, OBS: 1, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
         MWS_FILLER:                   {UNOBS: 1630, MORE_NOB1: 1631, MORE_NOB2: 1631, MORE_NOB3: 2, DONE: 2, OBS: 1, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
         MWS_GD1:                      {UNOBS: 0, MORE_NOB1: 0, MORE_NOB2: 0, MORE_NOB3: 0, DONE: 0, OBS: 0, DONOTOBSERVE: 0, MORE_MIDZQSO: 0}
@@ -556,7 +554,6 @@ numobs:
         MWS_UFD_PM2:                 20
         MWS_UFD_PM3:                 20
         MWS_PM_ONLY:                 5
-        MWS_FAINT_NO_PM:             10
         MWS_FAINT_CMD:               10
         MWS_FILLER:                  10
         MWS_GD1:                     -1

@@ -55,7 +55,9 @@ def is_in_GD1(objs, streamname):
     :class:`array_like`
         ``True`` if the object is a bright "BRIGHT_PM3" target.
     :class:`array_like`
-        ``True`` if the object is a faint "FAINT_NO_PM" target.
+        ``True`` if the object is a faint "PM_ONLY" target.
+    :class:`array_like`
+        ``True`` if the object is a faint "FAINT_CMD" target.
     :class:`array_like`
         ``True`` if the object is a white dwarf "FILLER" target.
     """
@@ -231,9 +233,8 @@ def is_in_GD1(objs, streamname):
     f_bright_pm3 = np.zeros(nobjs, dtype=bool)
     f_faint_cmd = np.zeros(nobjs, dtype=bool)
     f_filler = np.zeros(nobjs, dtype=bool)
-    # return arrys for pm_only and faint_no_pm for consistency with dSph and UFD targeting
+    # NRS return array for pm_only for consistency with dSph and UFD targeting
     f_pm_only = np.zeros(nobjs, dtype=bool)
-    f_faint_no_pm = np.zeros(nobjs, dtype=bool)
     
     f_bright_pm1[in_stream] = bright_pm1
     f_bright_pm2[in_stream] = bright_pm2
@@ -241,7 +242,7 @@ def is_in_GD1(objs, streamname):
     f_faint_cmd[in_stream] = faint_cmd
     f_filler[in_stream] = filler
 
-    return f_bright_pm1, f_bright_pm2, f_bright_pm3, f_pm_only, f_faint_no_pm, f_faint_cmd, f_filler
+    return f_bright_pm1, f_bright_pm2, f_bright_pm3, f_pm_only, f_faint_cmd, f_filler
 
     
 
@@ -261,9 +262,15 @@ def is_in_ORPHAN(objs, streamname):
     Returns
     -------
     :class:`array_like`
-        ``True`` if the object is a bright "BRIGHT_PM" target.
+        ``True`` if the object is a bright "BRIGHT_PM1" target.
     :class:`array_like`
-        ``True`` if the object is a faint "FAINT_NO_PM" target.
+        ``True`` if the object is a bright "BRIGHT_PM2" target.
+    :class:`array_like`
+        ``True`` if the object is a bright "BRIGHT_PM3" target.
+    :class:`array_like`
+        ``True`` if the object is a faint "PM_ONLY" target.
+    :class:`array_like`
+        ``True`` if the object is a faint "FAINT_CMD" target.
     :class:`array_like`
         ``True`` if the object is a white dwarf "FILLER" target.
     """
@@ -440,9 +447,8 @@ def is_in_ORPHAN(objs, streamname):
     f_bright_pm3 = np.zeros(nobjs, dtype=bool)
     f_faint_cmd = np.zeros(nobjs, dtype=bool)
     f_filler = np.zeros(nobjs, dtype=bool)
-    # return arrays for pm_only and faint_no_pm for consistency with dwarf and ufd targeting
+    # NRS return array for pm_only for consistency with dwarf and ufd targeting
     f_pm_only = np.zeros(nobjs,dtype=bool)
-    f_faint_no_pm = np.zeros(nobjs,dtype=bool)
     
     f_bright_pm1[in_stream] = bright_pm1
     f_bright_pm2[in_stream] = bright_pm2
@@ -450,7 +456,7 @@ def is_in_ORPHAN(objs, streamname):
     f_faint_cmd[in_stream] = faint_cmd
     f_filler[in_stream] = filler
 
-    return f_bright_pm1, f_bright_pm2, f_bright_pm3, f_pm_only, f_faint_no_pm, f_faint_cmd, f_filler
+    return f_bright_pm1, f_bright_pm2, f_bright_pm3, f_pm_only, f_faint_cmd, f_filler
 
 
 def is_in_dwarf(objs, dwarf_name):
@@ -467,9 +473,6 @@ def is_in_dwarf(objs, dwarf_name):
     dwarf_name : :class:`str`
         Name of a dwarf galaxy that appears in the ../data/dwarfs.yaml file.
         Possibilities include 'BOOTES_1', 'CANES_VENATICI_1', 'DRACO_1', 'SEXTANS_1', and 'URSA_MINOR_1'.
-    visually_validate : :class:`bool`
-        Plot spatial, proper motion, and CMD selections
-
 
     Returns
     -------
@@ -482,7 +485,7 @@ def is_in_dwarf(objs, dwarf_name):
     :class:`array_like`
         ``True`` if the object is a faint "PM_ONLY" target.
     :class:`array_like`
-        ``True`` if the object is a faint "FAINT_NO_PM" target.
+        ``True`` if the object is a faint "FAINT_CMD" target.
     :class:`array_like`
         ``True`` if the object is a white dwarf "FILLER" target.
     """
@@ -545,7 +548,7 @@ def is_in_dwarf(objs, dwarf_name):
     brightpm2_magsel = betw(z, dwarf['BRIGHTPM1_LIMIT'], dwarf['BRIGHTPM2_LIMIT'])
     brightpm3_magsel = betw(z, dwarf['BRIGHTPM2_LIMIT'], dwarf['BRIGHTPM3_LIMIT'])
     pm_only_magsel = (r > dwarf['BRIGHT_LIMIT']) & (z <= dwarf['PM_ONLY_LIMIT'])
-    faint_no_pm_magsel = betw(z, dwarf['FAINT_NO_PM_LIMIT'], dwarf['FAINT_LIMIT'])
+    faint_cmd_magsel = betw(z, dwarf['FAINT_CMD_LIMIT'], dwarf['FAINT_LIMIT'])
     filler_magsel = betw(z, dwarf['FILLER_LIMIT'], dwarf['FAINT_LIMIT'])
 
     # NRS FILLER stellar locus selection.
@@ -568,26 +571,31 @@ def is_in_dwarf(objs, dwarf_name):
     # NRS PM_ONLY targets
     pm_only = ~cmd_sel & gaia_astrom_sel & field_sel & pm_only_magsel & betw(g0_r0, -0.3, 1.3)
 
-    # NRS FAINT_NO_PM targets
-    faint_no_pm = cmd_sel & field_sel & faint_no_pm_magsel & ~np.isfinite(idobjs['PMRA']) & _psflike(idobjs["TYPE"])
-
+    # NRS FAINT_CMD targets
+    faint_cmd = (
+        cmd_sel & field_sel & faint_cmd_magsel & _psflike(idobjs["TYPE"]) & ~bright_pm
+    )
+    
     # NRS FILLER targets
-    filler = field_sel & filler_magsel & stellar_locus_sel & betw(g0_r0, -0.3, 1.2) & _psflike(idobjs["TYPE"]) \
-        & ~bright_pm & ~pm_only & ~faint_no_pm
+    filler = (
+        field_sel & filler_magsel & stellar_locus_sel 
+        & betw(g0_r0, -0.3, 1.2) & _psflike(idobjs["TYPE"])
+        & ~bright_pm & ~pm_only & ~faint_cmd
+    )
 
     # CMR moved these here so we write numbers of the final selections, but less useful for timing
     log.info(f"Objects meeting BRIGHTPM selection: {np.sum(bright_pm)}")
     log.info(f"Objects meeting BRIGHTPM1 selection: {np.sum(bright_pm1)}")
     log.info(f"Objects meeting BRIGHTPM2 selection: {np.sum(bright_pm2)}")
     log.info(f"Objects meeting BRIGHTPM3 selection: {np.sum(bright_pm3)}")
-    log.info(f"Objects meeting FAINT_NO_PM selection: {np.sum(faint_no_pm)}")
+    log.info(f"Objects meeting FAINT_CMD selection: {np.sum(faint_cmd)}")
     log.info(f"Objects meeting PM_ONLY selection: {np.sum(pm_only)}")
     log.info(f"Objects meeting FILLER selection: {np.sum(filler)}")
     log.info(f"Finished selection for {dwarf_name}...t={time()-start:.1f}s")
 
     # ADM sanity check that selections do not overlap.
     check = bright_pm1.astype(int) + bright_pm2.astype(int) + bright_pm3.astype(int) + pm_only.astype(int) \
-        + faint_no_pm.astype(int) + filler.astype(int)
+        + faint_cmd.astype(int) + filler.astype(int)
     if len(check) > 0:
         if np.max(check) > 1:
             msg = "Selections should be unique but they overlap!"
@@ -600,20 +608,18 @@ def is_in_dwarf(objs, dwarf_name):
     f_bright_pm1 = np.zeros(nobjs, dtype=bool)
     f_bright_pm2 = np.zeros(nobjs, dtype=bool)
     f_bright_pm3 = np.zeros(nobjs, dtype=bool)
-    f_faint_no_pm = np.zeros(nobjs, dtype=bool)
+    f_faint_cmd = np.zeros(nobjs, dtype=bool)
     f_filler = np.zeros(nobjs, dtype=bool)
     f_pm_only = np.zeros(nobjs,dtype=bool)
-    # return faint_cmd for consistency with streams
-    f_faint_cmd = np.zeros(nobjs,dtype=bool)
     
     f_bright_pm1[in_dwarf] = bright_pm1
     f_bright_pm2[in_dwarf] = bright_pm2
     f_bright_pm3[in_dwarf] = bright_pm3
     f_pm_only[in_dwarf] = pm_only
-    f_faint_no_pm[in_dwarf] = faint_no_pm
+    f_faint_cmd[in_dwarf] = faint_cmd
     f_filler[in_dwarf] = filler
 
-    return f_bright_pm1, f_bright_pm2, f_bright_pm3, f_pm_only, f_faint_no_pm, f_faint_cmd, f_filler
+    return f_bright_pm1, f_bright_pm2, f_bright_pm3, f_pm_only, f_faint_cmd, f_filler
 
 
 def set_target_bits(objs, targmwext_names=["GD1", "BOOTES_1"]):
@@ -668,20 +674,19 @@ def set_target_bits(objs, targmwext_names=["GD1", "BOOTES_1"]):
             func_name = f"is_in_{targmwext}"
             func_call = globals()[func_name]
 
-        ibright_pm1, ibright_pm2, ibright_pm3, ipm_only, ifaint_no_pm, ifaint_cmd, ifiller = func_call(
+        ibright_pm1, ibright_pm2, ibright_pm3, ipm_only, ifaint_cmd, ifiller = func_call(
             objs, targmwext)
 
-        bright_pm1, bright_pm2, bright_pm3, pm_only, faint_no_pm, faint_cmd, filler = targmwext_resolve(
-            targmwext, mws_target, ibright_pm1, ibright_pm2, ibright_pm3, ipm_only, ifaint_no_pm, 
+        bright_pm1, bright_pm2, bright_pm3, pm_only, faint_cmd, filler = targmwext_resolve(
+            targmwext, mws_target, ibright_pm1, ibright_pm2, ibright_pm3, ipm_only, 
             ifaint_cmd, ifiller)
 
         # ADM/CMR set mws desi extension bit
-        any_set = bright_pm1 | bright_pm2 | bright_pm3 | pm_only | faint_no_pm | faint_cmd | filler
+        any_set = bright_pm1 | bright_pm2 | bright_pm3 | pm_only | faint_cmd | filler
         mws_target |= any_set * mws_mask.MWS_EXT
         # CMR set stream name bit
         mws_target |= any_set * mws_mask[bit_name]
         # CMR now set target subclass bit masks
-        mws_target |= faint_no_pm * mws_mask.MWS_FAINT_NO_PM
         mws_target |= faint_cmd * mws_mask.MWS_FAINT_CMD
         mws_target |= filler * mws_mask.MWS_FILLER
         mws_target |= pm_only * mws_mask.MWS_PM_ONLY
