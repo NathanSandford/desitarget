@@ -582,13 +582,13 @@ def is_in_dwarf(objs, dwarf_name):
 
     # NRS FAINT_CMD targets
     # NRS passes CMD selection
-    # NRS passes PM + Parallax selection OR has no Gaia astrometry
+    # NRS does NOT have Gaia astrometry OR is fainter than BRIGHTPM3_LIMIT
     # NRS passes Spatial selection
     # NRS passes Magnitude selection
     # NRS NOT in BRIGHT_PM
     faint_cmd = (
         cmd_sel & field_sel & faint_cmd_magsel & _psflike(idobjs["TYPE"]) 
-        & (gaia_astrom_sel | ~np.isfinite(idobjs["PMRA"]))
+        & (~np.isfinite(idobjs["PMRA"]) | (z > dwarf['BRIGHTPM3_LIMIT']))
         & ~bright_pm
     )
     
