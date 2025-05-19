@@ -563,20 +563,42 @@ def is_in_dwarf(objs, dwarf_name):
     stellar_locus_sel = stellar_locus_blue_sel | stellar_locus_red_sel
 
     # NRS BRIGHT_PM targets
+    # NRS passes CMD selection
+    # NRS passes PM + Parallax selection
+    # NRS passes Spatial selection
+    # NRS passes Magnitude selection
     bright_pm1 = cmd_sel & gaia_astrom_sel & field_sel & brightpm1_magsel
     bright_pm2 = cmd_sel & gaia_astrom_sel & field_sel & brightpm2_magsel
     bright_pm3 = cmd_sel & gaia_astrom_sel & field_sel & brightpm3_magsel
     bright_pm = bright_pm1 | bright_pm2 | bright_pm3
 
     # NRS PM_ONLY targets
+    # NRS does NOT pass CMD selection
+    # NRS passes PM + Parallax selection
+    # NRS passes Spatial selection
+    # NRS passes Magnitude selection
+    # NRS passes Color selection
     pm_only = ~cmd_sel & gaia_astrom_sel & field_sel & pm_only_magsel & betw(g0_r0, -0.3, 1.3)
 
     # NRS FAINT_CMD targets
+    # NRS passes CMD selection
+    # NRS passes PM + Parallax selection OR has no Gaia astrometry
+    # NRS passes Spatial selection
+    # NRS passes Magnitude selection
+    # NRS NOT in BRIGHT_PM
     faint_cmd = (
-        cmd_sel & field_sel & faint_cmd_magsel & _psflike(idobjs["TYPE"]) & ~bright_pm
+        cmd_sel & field_sel & faint_cmd_magsel & _psflike(idobjs["TYPE"]) 
+        & (gaia_astrom_sel | ~np.isfinite(idobjs["PMRA"]))
+        & ~bright_pm
     )
     
     # NRS FILLER targets
+    # NRS passes Spatial selection
+    # NRS passes Magnitude selection
+    # NRS passes Stellar Locus selection
+    # NRS passes Color selection
+    # NRS passes PSF Type selection
+    # NRS NOT in BRIGHT_PM, PM_ONLY, or FAINT_CMD
     filler = (
         field_sel & filler_magsel & stellar_locus_sel 
         & betw(g0_r0, -0.3, 1.2) & _psflike(idobjs["TYPE"])
