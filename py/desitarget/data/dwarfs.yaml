@@ -57,6 +57,8 @@ BOOTES_1:
     FAINT_LIMIT: 21.50
     # NRS MWS extension target bit set to use (UFD, DSPH, or STREAM)
     TARGET_BIT_SET: UFD
+    # CMR ranking order for resolving conflicts if an obj is targeted as more than one dwarf or stream
+    TARGMWEXT_RANK: 1
 
 # NRS the CANES_VENATICI_1 dSph.
 CANES_VENATICI_1:
@@ -115,6 +117,8 @@ CANES_VENATICI_1:
     FAINT_LIMIT: 21.50
     # NRS MWS extension target bit set to use (UFD, DSPH, or STREAM)
     TARGET_BIT_SET: UFD
+    # CMR ranking order for resolving conflicts if an obj is targeted as more than one dwarf or stream
+    TARGMWEXT_RANK: 1
 
 # NRS the DRACO_1 dSph.
 DRACO_1:
@@ -173,7 +177,9 @@ DRACO_1:
     FAINT_LIMIT: 21.50
     # NRS MWS extension target bit set to use (UFD, DSPH, or STREAM)
     TARGET_BIT_SET: DSPH
-
+    # CMR ranking order for resolving conflicts if an obj is targeted as more than one dwarf or stream
+    TARGMWEXT_RANK: 1
+    
 # NRS the SEXTANS_1 dSph.
 SEXTANS_1:
     # NRS galaxy coordinates in degrees.
@@ -231,7 +237,9 @@ SEXTANS_1:
     FAINT_LIMIT: 21.50
     # NRS MWS extension target bit set to use (UFD, DSPH, or STREAM)
     TARGET_BIT_SET: DSPH
-
+    # CMR ranking order for resolving conflicts if an obj is targeted as more than one dwarf or stream
+    TARGMWEXT_RANK: 1
+    
 # NRS the URSA_MINOR_1 dSph.
 URSA_MINOR_1:
     # NRS galaxy coordinates in degrees.
@@ -289,3 +297,5 @@ URSA_MINOR_1:
     FAINT_LIMIT: 21.50
     # NRS MWS extension target bit set to use (UFD, DSPH, or STREAM)
     TARGET_BIT_SET: DSPH
+    # CMR ranking order for resolving conflicts if an obj is targeted as more than one dwarf or stream
+    TARGMWEXT_RANK: 1
